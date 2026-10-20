@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   BookOpen, Users, Settings, ShieldCheck,
-  BarChart3, Database, Search, RefreshCw, ChevronRight
+  BarChart3, Database, Search, RefreshCw, ChevronRight, Building2
 } from 'lucide-react';
 
 interface ManualSection {
@@ -23,21 +23,21 @@ export default function UserManual() {
         <div>
           <h2 style={styles.sectionTitle}>Introducción al Sistema</h2>
           <p style={styles.paragraph}>
-            Bienvenido al <strong>Sistema de Gestión de Bolsa de Trabajo</strong> de la Oficina de Empleo Municipal.
+            Bienvenido al <strong>Sistema de Gestión de Bolsa de Trabajo</strong> de la Oficina de Empleo Municipal de San José.
             Esta plataforma Full-Stack ha sido diseñada para optimizar, centralizar y digitalizar el registro,
-            seguimiento e inserción laboral de los ciudadanos del municipio.
+            seguimiento e inserción laboral tanto de los <strong>ciudadanos postulantes</strong> como de las <strong>empresas e instituciones productivas</strong> de la región.
           </p>
           <p style={styles.paragraph}>
             El sistema reemplaza las antiguas planillas de cálculo manuales por una solución web moderna,
-            segura y robusta, capaz de procesar cientos de registros históricos con tiempos de carga instantáneos
-            y herramientas avanzadas de análisis estadístico.
+            segura y robusta, capaz de procesar cientos de registros históricos con tiempos de carga instantáneos,
+            catálogos dinámicos configurables y herramientas avanzadas de análisis estadístico.
           </p>
           <div style={styles.cardInfo}>
             <h4 style={styles.cardInfoTitle}>Propósito Principal</h4>
             <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-main-hex)' }}>
               Facilitar el nexo entre la oferta y la demanda laboral del municipio, brindando a los operarios
-              de la oficina una herramienta ágil para perfilar candidatos y a los administradores un panel demográfico
-              en tiempo real para planificar capacitaciones y políticas de empleo.
+              de la oficina una herramienta ágil para perfilar candidatos, relevar empresas con búsquedas activas
+              y ofrecer a la coordinación un panel demográfico y productivo en tiempo real para planificar capacitaciones y políticas de empleo.
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function UserManual() {
         <div>
           <h2 style={styles.sectionTitle}>Control de Acceso (RBAC)</h2>
           <p style={styles.paragraph}>
-            El acceso al sistema está resguardado mediante tokens JWT y se divide en dos perfiles o roles clave:
+            El acceso al sistema está resguardado mediante sesiones seguras con cookies <code>HttpOnly</code> y tokens JWT, dividiéndose en dos perfiles principales:
           </p>
 
           <div style={styles.grid}>
@@ -63,11 +63,11 @@ export default function UserManual() {
                 <h3 style={styles.roleTitle}>Entrevistador</h3>
               </div>
               <ul style={styles.bulletList}>
-                <li>Registro completo de postulantes nuevos en la base de datos.</li>
-                <li>Búsqueda y filtrado rápido por texto o por rubro comercial.</li>
-                <li>Visualización y edición del CV de los candidatos.</li>
-                <li>Asociación de entrevistas de seguimiento.</li>
-                <li>Gestión de rubros comerciales.</li>
+                <li>Registro completo, edición y consulta de postulantes y su CV.</li>
+                <li>Cambio rápido de estado laboral desde el listado principal.</li>
+                <li>Registro de entrevistas, visitas de seguimiento, notas privadas y calificación.</li>
+                <li>Alta, edición y consulta de fichas en el módulo de <strong>Empresas</strong>.</li>
+                <li>Consulta de catálogos de rubros, barrios, niveles educativos y estados.</li>
               </ul>
             </div>
 
@@ -82,9 +82,10 @@ export default function UserManual() {
                 Posee todos los permisos de Entrevistador, sumando:
               </p>
               <ul style={styles.bulletList}>
-                <li>Acceso exclusivo al panel de <strong>Informes</strong> estadísticos.</li>
-                <li>Permiso de eliminación lógica de postulantes.</li>
-                <li>Gestión completa de usuarios (Alta de entrevistadores, cambio de contraseñas y bajas del sistema).</li>
+                <li>Acceso exclusivo al panel integral de <strong>Informes</strong> (métricas de Postulantes y de Empresas).</li>
+                <li>Baja lógica y restauración de postulantes y baja lógica de empresas.</li>
+                <li>Administración completa de <strong>Catálogos del Sistema</strong> (alta, edición y baja de Rubros, Barrios, Niveles Educativos y Estados Laborales).</li>
+                <li>Gestión completa de cuentas en la pestaña <strong>Personal</strong> (alta de entrevistadores, cambio de contraseñas, activación/suspensión y bajas).</li>
               </ul>
             </div>
           </div>
@@ -97,104 +98,130 @@ export default function UserManual() {
       icon: <Search size={18} />,
       content: (
         <div>
-          <h2 style={styles.sectionTitle}>Búsqueda, Registro y Filtros</h2>
+          <h2 style={styles.sectionTitle}>Búsqueda, Registro y Seguimiento de Postulantes</h2>
 
-          <h3 style={styles.subSectionTitle}>1. Búsqueda y Paginación Eficiente</h3>
+          <h3 style={styles.subSectionTitle}>1. Búsqueda, Cambio Rápido de Estado y Paginación</h3>
           <p style={styles.paragraph}>
-            En la pantalla principal, el sistema utiliza paginación en servidor (20 elementos por página).
-            Esto permite realizar búsquedas instantáneas en la base de datos.
-            Puedes escribir el nombre, apellido o DNI en la barra de búsqueda superior y seleccionar
-            un rubro específico para refinar los resultados.
+            En la pantalla principal, el sistema utiliza paginación en servidor (20 elementos por página) con indicador de tiempo de respuesta.
+            Puedes buscar instantáneamente por nombre, apellido o DNI, filtrar por rubro o estado laboral, y cambiar el <strong>Estado Laboral</strong> de cualquier postulante haciendo clic directamente sobre su etiqueta de estado en la tabla.
           </p>
 
           <h3 style={styles.subSectionTitle}>2. Filtros Avanzados y Limpieza Rápida</h3>
           <p style={styles.paragraph}>
-            Al hacer clic en el botón de <strong>Filtros</strong>, se despliega un panel superior organizado mediante un diseño Flexbox responsivo con tres selectores de igual ancho: <strong>Rango de Edad</strong>, <strong>Nivel Educativo</strong> y <strong>Barrio / Zona</strong>, además de la casilla para postulantes con <strong>CUD</strong>.
+            Al hacer clic en el botón de <strong>Filtros</strong>, se despliega un panel superior con selectores combinables: <strong>Rango de Edad</strong>, <strong>Nivel Educativo</strong>, <strong>Barrio / Zona</strong> y la casilla para postulantes con <strong>CUD (Discapacidad)</strong>.
           </p>
           <p style={styles.paragraph}>
-            Si hay al menos un filtro de búsqueda o avanzado activo, aparecerá de forma dinámica el botón <strong>Limpiar Filtros</strong> (identificado con una <span style={{ fontWeight: 600 }}>X</span>) justo al lado del botón de Filtros. Al pulsarlo, se restablecerán instantáneamente todos los criterios a sus valores iniciales y la lista volverá a la primera página de resultados de manera limpia.
+            Cuando hay al menos un criterio activo, aparece dinámicamente el botón <strong>Limpiar Filtros (X)</strong> para restablecer todos los filtros y regresar a la primera página con un solo clic.
           </p>
 
           <h3 style={styles.subSectionTitle}>3. Visualización de Múltiples Rubros en la Tabla</h3>
           <p style={styles.paragraph}>
-            Para optimizar la legibilidad directa sin necesidad de abrir el expediente, los rubros en la columna central se organizan en hasta <strong>dos filas horizontales</strong>:
+            Para optimizar la lectura sin necesidad de abrir cada expediente, los rubros se organizan en hasta <strong>dos filas horizontales</strong>:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}>Si el candidato cuenta con hasta 4 rubros vinculados, se muestran todos a su ancho y texto completo en dos renglones.</li>
-            <li style={{ marginBottom: '0' }}>Si cuenta con 5 o más rubros, la interfaz dibujará las primeras 3 etiquetas completas y un badge con la cantidad restante (ej: `+2`). Al posicionar el mouse sobre este indicador, emergerá un popover flotante con el resto de las especialidades a texto completo.</li>
+            <li style={{ marginBottom: '6px' }}>Si el candidato cuenta con hasta 4 rubros vinculados, se muestran todos a texto completo en dos renglones.</li>
+            <li style={{ marginBottom: '0' }}>Si cuenta con 5 o más rubros, se muestran las primeras 3 etiquetas completas y un indicador (ej: <code>+2</code>) que al hacer clic despliega un popover flotante con el resto de las especialidades.</li>
           </ul>
 
           <h3 style={styles.subSectionTitle}>4. Registro de un Candidato</h3>
           <p style={styles.paragraph}>
-            Al hacer clic en "Nuevo", se abrirá un formulario dinámico dividido en secciones:
+            Al hacer clic en <strong>Nuevo</strong>, se abre un formulario dinámico estructurado en bloques:
           </p>
           <div style={styles.listSteps}>
             <div style={styles.stepItem}>
               <span style={styles.stepNumber}>1</span>
               <div>
-                <strong>Datos Personales, de Contacto y Fotografía:</strong> Nombre, apellido, DNI, CUIL, teléfonos, dirección y foto de perfil.
-                Los campos marcados con (*) son obligatorios. La fotografía cargada debe corresponder a una imagen válida (formato data:image/...) y su tamaño máximo de archivo no debe exceder los 2 MB.
+                <strong>Datos Personales, de Contacto y Fotografía:</strong> Nombre, apellido, DNI, CUIL, teléfonos, dirección, barrio y foto de perfil (formatos de imagen válidos hasta 2 MB).
               </div>
             </div>
             <div style={styles.stepItem}>
               <span style={styles.stepNumber}>2</span>
               <div>
-                <strong>Situación Social y de Salud:</strong> Información sobre Discapacidad (CUD), posesión de movilidad,
-                licencia de conducir y planes sociales activos.
+                <strong>Situación Social, Tributaria y de Salud:</strong> Información sobre Discapacidad (CUD), movilidad propia, licencia de conducir, monotributo/ATER/habilitación municipal, obra social y planes sociales activos.
               </div>
             </div>
             <div style={styles.stepItem}>
               <span style={styles.stepNumber}>3</span>
               <div>
-                <strong>Historial Académico y Experiencia:</strong> Sección interactiva para añadir múltiples estudios realizados
-                y experiencias laborales previas, permitiendo indicar si el postulante trabaja actualmente allí. Las subtarjetas del formulario adaptan automáticamente su fondo y contraste para ser completamente legibles tanto en tema claro como oscuro.
+                <strong>Historial Académico y Experiencia Laboral:</strong> Sección interactiva para añadir múltiples estudios realizados y experiencias laborales previas.
               </div>
             </div>
           </div>
 
-          <h3 style={styles.subSectionTitle}>5. Navegación Secuencial y Atajos de Teclado</h3>
+          <h3 style={styles.subSectionTitle}>5. Navegación Secuencial y Atajos de Teclado en el CV</h3>
           <p style={styles.paragraph}>
-            Al visualizar el detalle de un postulante mediante el botón "Ver CV", el sistema despliega en la barra superior los controles de navegación <strong>Anterior</strong> y <strong>Siguiente</strong>. Estos controles respetan la lista de candidatos resultantes de tu búsqueda o filtros en el Dashboard principal, permitiendo examinar expedientes uno tras otro de forma ágil sin necesidad de volver a la tabla general.
-          </p>
-          <p style={styles.paragraph}>
-            Para dinamizar aún más el proceso de revisión y auditoría, puedes utilizar los siguientes <strong>atajos de teclado</strong> en esta pantalla:
+            Al abrir el expediente mediante el botón <strong>Ver CV</strong>, la barra superior habilita los botones <strong>Anterior</strong> y <strong>Siguiente</strong> junto con atajos de teclado para recorrer los resultados filtrados sin volver al listado:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}><strong>Flecha Derecha (&rarr;)</strong>: Avanza al siguiente postulante de la lista de forma inmediata.</li>
-            <li style={{ marginBottom: '6px' }}><strong>Flecha Izquierda (&larr;)</strong>: Retrocede al postulante anterior de la lista.</li>
-            <li style={{ marginBottom: '0' }}><strong>Tecla Escape (Esc)</strong>: Cierra el expediente de CV del postulante actual y regresa automáticamente a la tabla principal del Dashboard de forma limpia.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Flecha Derecha (&rarr;)</strong>: Avanza al siguiente postulante de la lista filtrada.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Flecha Izquierda (&larr;)</strong>: Retrocede al postulante anterior.</li>
+            <li style={{ marginBottom: '0' }}><strong>Tecla Escape (Esc)</strong>: Cierra la vista del CV y regresa al listado principal.</li>
           </ul>
 
-          <h3 style={styles.subSectionTitle}>6. Historial de Visitas y Evolución</h3>
+          <h3 style={styles.subSectionTitle}>6. Panel del Entrevistador, Autoguardado y Línea de Tiempo</h3>
           <p style={styles.paragraph}>
-            En el lateral derecho del expediente se presenta el <strong>Historial de Visitas</strong>. Esta sección es una línea de tiempo vertical dinámica que carga en tiempo real todas las entrevistas y visitas registradas para el postulante. Cada elemento de la línea de tiempo muestra la fecha de la visita, el objetivo, el nombre del operario/entrevistador que la realizó, la prioridad de inserción y el estado del trámite. Al hacer clic en cualquier visita de la lista, esta se expandirá para revelar las <strong>Observaciones Técnicas y de Evolución</strong> registradas, facilitando el seguimiento del candidato a lo largo del tiempo de manera clara.
-          </p>
-
-          <h3 style={styles.subSectionTitle}>7. Vista Previa de CV en Modo Claro Forzado</h3>
-          <p style={styles.paragraph}>
-            La hoja del currículum (CV) se muestra en pantalla imitando una página física para facilitar la lectura e impresión. Con el fin de garantizar un contraste óptimo del texto y asegurar que la previsualización del documento sea exactamente idéntica al archivo que se guardará en PDF o imprimirá físicamente, esta hoja se representa <strong>siempre en fondo claro (blanco)</strong> con letras de color oscuro. Este diseño se mantiene de forma intencional y automática incluso si el usuario está navegando el resto de la aplicación bajo el Modo Oscuro.
-          </p>
-
-          <h3 style={styles.subSectionTitle}>8. Panel del Entrevistador (Notas, Calificaciones y Registro de Visitas)</h3>
-          <p style={styles.paragraph}>
-            A la derecha del CV electrónico se visualiza el panel administrativo de entrevistas, que permite realizar el seguimiento técnico:
+            A la derecha de la hoja A4 del CV (que se mantiene siempre en fondo blanco para garantizar fidelidad al exportar a PDF o imprimir) se ubica el panel de seguimiento interno:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}><strong>Calificación por Estrellas</strong>: Asigna una puntuación del 1 al 5 haciendo clic sobre las estrellas correspondientes para calificar la aptitud del candidato.</li>
-            <li style={{ marginBottom: '6px' }}><strong>Notas Privadas</strong>: Un espacio confidencial para anotaciones generales y percepciones rápidas.</li>
-            <li style={{ marginBottom: '6px' }}><strong>Autoguardado Asíncrono (Autosave)</strong>: Para evitar la pérdida de información y mejorar la agilidad de los operarios, las <strong>Notas Privadas</strong> y la <strong>Calificación por Estrellas</strong> se guardan automáticamente tras 1.5 segundos de inactividad de escritura (lógica <em>debounce</em>). El botón de guardado refleja dinámicamente este estado: "Guardando..." en color azul, "✔ Guardado" en verde por 2 segundos tras el éxito, y "Error al guardar" en rojo en caso de falla de conexión (permitiendo forzar el guardado manual con un clic).</li>
-            <li style={{ marginBottom: '6px' }}><strong>Registrar Nueva Visita (Formulario Inline)</strong>: Al pulsar el botón "Registrar" en la cabecera del historial, se despliega un formulario interactivo para registrar un nuevo contacto con el ciudadano. Debes ingresar obligatoriamente el <strong>Objetivo de la Consulta</strong> y, opcionalmente, detallar la evolución en <strong>Observaciones Técnicas</strong>, definir la <strong>Prioridad de Inserción</strong> (Alta, Media, Baja) y establecer el <strong>Estado del Trámite</strong> (Pendiente, En Proceso, Finalizado).</li>
-            <li style={{ marginBottom: '0' }}><strong>Guardado Persistente</strong>: Tanto el registro de visitas como la calificación y notas se sincronizan de forma persistente en la base de datos MySQL del backend, actualizando automáticamente la línea de tiempo sin necesidad de refrescar la página.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Calificación por Estrellas (1 a 5) y Notas Privadas:</strong> Se guardan automáticamente tras 1.5 segundos de inactividad (<em>Autosave</em>) y nunca se imprimen ni se incluyen en el PDF del ciudadano.</li>
+            <li style={{ marginBottom: '0' }}><strong>Historial de Visitas:</strong> Línea de tiempo interactiva donde se pueden consultar entrevistas anteriores y registrar nuevas visitas indicando objetivo, observaciones técnicas, prioridad de inserción y estado del trámite.</li>
           </ul>
-
-          <h3 style={styles.subSectionTitle}>9. Privacidad y Seguridad del Feedback</h3>
+        </div>
+      )
+    },
+    {
+      id: 'empresas',
+      title: 'Relevamiento de Empresas',
+      icon: <Building2 size={18} />,
+      content: (
+        <div>
+          <h2 style={styles.sectionTitle}>Módulo de Relevamiento de Empresas</h2>
           <p style={styles.paragraph}>
-            Tanto las <strong>Notas Privadas</strong> como la <strong>Calificación</strong> son de carácter estrictamente confidencial para el entrevistador. El sistema garantiza su privacidad mediante reglas de exclusión automática:
+            La pestaña <strong>Empresas</strong> permite al personal de la Oficina de Empleo relevar comercios, industrias, PyMEs y emprendimientos de la zona, centralizando sus datos de contacto y su demanda actual o futura de trabajadores.
+          </p>
+
+          <h3 style={styles.subSectionTitle}>1. Indicadores Rápidos y Filtros de Demanda</h3>
+          <p style={styles.paragraph}>
+            En la parte superior del módulo se exhiben tres contadores en tiempo real:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}>No se incluyen ni se renderizan al presionar el botón <strong>Descargar PDF</strong>.</li>
-            <li style={{ marginBottom: '0' }}>Se ocultan por completo en la visualización física o vista previa a través del comando <strong>Imprimir</strong> gracias a hojas de estilo dinámicas de impresión (`@media print`), incluso si el usuario visualiza la pantalla en modo oscuro.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Empresas relevadas:</strong> Total de fichas empresariales activas.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Buscan personal:</strong> Empresas que declararon búsqueda activa (<code>Busca personal</code>).</li>
+            <li style={{ marginBottom: '0' }}><strong>Interés en programas de empleo:</strong> Empresas interesadas en articular con programas municipales o de inserción laboral.</li>
           </ul>
+          <p style={styles.paragraph}>
+            Debajo de los indicadores puedes buscar instantáneamente por razón social, nombre de fantasía, número de CUIT (con o sin guiones), persona de contacto, email, actividad o perfiles demandados, y combinarlo con los selectores de <strong>Rubro</strong> y <strong>Demanda laboral</strong>.
+          </p>
+
+          <h3 style={styles.subSectionTitle}>2. Alta y Edición de Ficha de Empresa</h3>
+          <p style={styles.paragraph}>
+            Al pulsar <strong>Nueva Empresa</strong> (o el icono de edición en una tarjeta existente), se abre el formulario organizado en tres secciones:
+          </p>
+          <div style={styles.listSteps}>
+            <div style={styles.stepItem}>
+              <span style={styles.stepNumber}>1</span>
+              <div>
+                <strong>Identificación y Ubicación:</strong> Razón social (obligatoria), nombre de fantasía, <strong>CUIT</strong> (con formato automático <code>XX-XXXXXXXX-X</code> y validación de dígito verificador AFIP), rubro, actividad principal, rango de dotación de empleados (<code>1-5</code>, <code>6-10</code>, <code>11-50</code>, <code>51-200</code>, <code>+200</code>), dirección, barrio y localidad (por defecto <em>San José</em>).
+              </div>
+            </div>
+            <div style={styles.stepItem}>
+              <span style={styles.stepNumber}>2</span>
+              <div>
+                <strong>Datos de Contacto:</strong> Nombre y cargo del referente, teléfono primario, teléfono secundario/celular, correo electrónico y sitio web o red social. Se exige al menos un medio de contacto válido (teléfono o email).
+              </div>
+            </div>
+            <div style={styles.stepItem}>
+              <span style={styles.stepNumber}>3</span>
+              <div>
+                <strong>Relevamiento y Demanda Laboral:</strong> Interés en incorporar personal (<em>Busca personal</em>, <em>Interés a futuro</em>, <em>Sin búsquedas</em>, <em>Sin dato</em>), fecha de relevamiento, casilla de interés en programas municipales de empleo, detalle de perfiles demandados y observaciones generales. El sistema registra automáticamente qué operador realizó el relevamiento.
+              </div>
+            </div>
+          </div>
+
+          <h3 style={styles.subSectionTitle}>3. Ficha Detallada y Reactivación por CUIT</h3>
+          <p style={styles.paragraph}>
+            Haciendo clic en el icono del ojo (<strong>Ver ficha completa</strong>) en cualquier tarjeta se accede a la vista institucional completa con accesos directos para llamar por teléfono, enviar correo o abrir el sitio web de la empresa. Si se da de baja una empresa y tiempo después se vuelve a registrar el mismo CUIT, el sistema reactiva automáticamente su registro histórico actualizando sus datos.
+          </p>
         </div>
       )
     },
@@ -206,22 +233,20 @@ export default function UserManual() {
         <div>
           <h2 style={styles.sectionTitle}>Papelera de Eliminados y Reactivación</h2>
           <p style={styles.paragraph}>
-            Para resguardar el historial (auditorías, visitas anteriores del ciudadano y derivaciones), el sistema no realiza
-            borrados físicos de postulantes por defecto, sino que aplica una baja lógica (`activo = false`).
+            Para resguardar la trazabilidad histórica (auditorías, visitas anteriores del ciudadano, relevamientos y derivaciones), el sistema no realiza borrados físicos destructivos, sino que aplica una <strong>baja lógica</strong> (<code>activo = false</code> y marca de tiempo <code>deleted_at</code>).
           </p>
 
           <h3 style={styles.subSectionTitle}>1. Papelera de Inactivos y Restauración Manual</h3>
           <p style={styles.paragraph}>
-            El sistema proporciona una papelera de reciclaje integrada. Para visualizar los registros inactivos (postulantes dados de baja), simplemente dirígete a la barra de búsqueda principal en el Dashboard y selecciona la opción <strong>"Inactivos / Eliminados"</strong> en el desplegable de Estados.
+            Para visualizar los postulantes dados de baja, dirígete a la barra de búsqueda principal en el listado de <strong>Postulantes</strong> y selecciona la opción <strong>"Inactivos / Eliminados"</strong> en el desplegable de estados.
           </p>
           <p style={styles.paragraph}>
-            Al ingresar a esta vista especial, el listado mostrará únicamente los perfiles con baja lógica. El botón de eliminar (cesto de basura) se transformará en un botón verde circular de <strong>Restaurar</strong>. Al hacer clic sobre él, se solicitará confirmación mediante un modal antes de reactivar al postulante y reincorporarlo al listado activo principal.
+            En esta vista especial, el botón de eliminar se transforma en el botón verde de <strong>Restaurar</strong>, permitiendo reincorporar al postulante al padrón activo con un clic.
           </p>
 
           <h3 style={styles.subSectionTitle}>2. Mecanismo de Reactivación Automática</h3>
           <p style={styles.paragraph}>
-            Si intentas registrar un postulante que ya existía pero que fue eliminado previamente (baja lógica), el sistema ejecutará
-            el algoritmo de Reactivación Automática de forma transparente:
+            Si intentas dar de alta un postulante (o empresa) cuyo DNI/CUIL/CUIT había sido dado de baja previamente, el sistema ejecuta el algoritmo de Reactivación Automática:
           </p>
 
           <div style={styles.flowCard}>
@@ -230,11 +255,10 @@ export default function UserManual() {
               <h4 style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: 'var(--accent-green)' }}>¿Cómo opera el algoritmo?</h4>
             </div>
             <ol style={{ ...styles.bulletList, paddingLeft: '20px', margin: 0 }}>
-              <li style={{ marginBottom: '8px' }}>El backend detecta si el DNI o CUIL ingresado pertenece a un ciudadano inactivo.</li>
-              <li style={{ marginBottom: '8px' }}>En vez de arrojar error por duplicado, restaura el registro cambiando su estado a activo (`deletedAt = null`, `activo = true`).</li>
-              <li style={{ marginBottom: '8px' }}>Sobrescribe la información personal vieja con los nuevos datos completados en el formulario.</li>
-              <li style={{ marginBottom: '8px' }}>Limpia e inyecta la nueva lista de estudios y experiencias laborales.</li>
-              <li style={{ marginBottom: '0' }}>Registra de forma automática una nueva Entrevista de Registro Inicial en la base de datos para auditar quién realizó la reactivación y emite una alerta toast informativa en el panel.</li>
+              <li style={{ marginBottom: '8px' }}>El backend detecta si el DNI, CUIL o CUIT ingresado pertenece a un registro inactivo.</li>
+              <li style={{ marginBottom: '8px' }}>En vez de arrojar error por duplicado, restaura el registro cambiando su estado a activo (<code>deletedAt = null</code>, <code>activo = true</code>).</li>
+              <li style={{ marginBottom: '8px' }}>Actualiza la ficha con los nuevos datos cargados en el formulario.</li>
+              <li style={{ marginBottom: '0' }}>Registra la trazabilidad del operador que realizó la reactivación y notifica en pantalla mediante una alerta de éxito.</li>
             </ol>
           </div>
         </div>
@@ -246,76 +270,92 @@ export default function UserManual() {
       icon: <BarChart3 size={18} />,
       content: (
         <div>
-          <h2 style={styles.sectionTitle}>Análisis Demográfico e Indicadores</h2>
+          <h2 style={styles.sectionTitle}>Panel de Control de Estadísticas (Postulantes y Empresas)</h2>
           <p style={styles.paragraph}>
-            El módulo de <strong>Informes</strong> (exclusivo para `SuperAdmin`) consolida la información
-            geográfica, social y laboral del municipio. Las métricas principales incluyen:
+            El módulo de <strong>Informes</strong> (exclusivo para <code>SuperAdmin</code>) consolida en una sola vista tanto las métricas sociolaborales de los <strong>Postulantes</strong> como los indicadores productivos de las <strong>Empresas Relevadas</strong>, ubicados inmediatamente debajo.
           </p>
 
+          <h3 style={styles.subSectionTitle}>1. Sección Superior: Métricas de Postulantes</h3>
           <div style={styles.grid}>
             <div style={styles.metricItem}>
-              <h4 style={styles.metricTitle}>Estado Laboral</h4>
-              <p style={styles.metricDesc}>Muestra el porcentaje en tiempo real de ciudadanos activos que se encuentran desempleados, empleados o en programas sociales.</p>
+              <h4 style={styles.metricTitle}>Indicadores Generales (KPIs)</h4>
+              <p style={styles.metricDesc}>Total de postulantes activos, nuevos perfiles agregados en la última semana (7 días) y en el último mes (30 días).</p>
             </div>
             <div style={styles.metricItem}>
-              <h4 style={styles.metricTitle}>Top de Barrios</h4>
-              <p style={styles.metricDesc}>Identifica las zonas geográficas con mayor concentración de postulantes registrados, ideal para planificar ferias de empleo.</p>
+              <h4 style={styles.metricTitle}>Desempeño y Estado Laboral</h4>
+              <p style={styles.metricDesc}>Cantidad y porcentaje de entrevistas por cada miembro del personal, y desglose por estado laboral (En búsqueda activa, Empleado, Programa Social, Desempleado).</p>
             </div>
             <div style={styles.metricItem}>
-              <h4 style={styles.metricTitle}>Nivel Educativo y Género</h4>
-              <p style={styles.metricDesc}>Agrupa a los postulantes según su nivel académico finalizado y presenta desgloses de género de los perfiles.</p>
+              <h4 style={styles.metricTitle}>Top 5 Barrios y Nivel Educativo</h4>
+              <p style={styles.metricDesc}>Zonas con mayor concentración de postulantes registrados y distribución según máximo nivel educativo alcanzado.</p>
             </div>
             <div style={styles.metricItem}>
-              <h4 style={styles.metricTitle}>Rendimiento del Personal</h4>
-              <p style={styles.metricDesc}>Audita y lista de forma descendente el total de postulantes que han registrado y entrevistado cada uno de los operadores del sistema.</p>
+              <h4 style={styles.metricTitle}>Género, Edad y Discapacidad (CUD)</h4>
+              <p style={styles.metricDesc}>Edad promedio y rangos etarios, distribución por género y proporción de personas con Certificado Único de Discapacidad (CUD) y sus tipos.</p>
             </div>
           </div>
 
-          <h3 style={styles.subSectionTitle}>Exportación e Impresión del Reporte</h3>
+          <h3 style={styles.subSectionTitle}>2. Sección Inferior: Métricas de Empresas Relevadas</h3>
           <p style={styles.paragraph}>
-            El panel administrativo admite la descarga de toda la información en formato de planilla de datos presionando <strong>Exportar CSV</strong>.
+            Debajo de los indicadores de postulantes, el informe despliega la misma estructura analítica aplicada al relevamiento empresarial:
           </p>
+          <div style={styles.grid}>
+            <div style={styles.metricItem}>
+              <h4 style={styles.metricTitle}>KPIs de Empresas</h4>
+              <p style={styles.metricDesc}>Total de empresas activas relevadas, agregadas en la última semana, agregadas en el último mes y total de empresas que buscan personal activamente.</p>
+            </div>
+            <div style={styles.metricItem}>
+              <h4 style={styles.metricTitle}>Relevamiento por Entrevistador y Demanda</h4>
+              <p style={styles.metricDesc}>Cantidad de empresas relevadas por cada entrevistador y distribución porcentual según demanda de personal (Busca personal, Interés a futuro, Sin búsquedas, Sin dato).</p>
+            </div>
+            <div style={styles.metricItem}>
+              <h4 style={styles.metricTitle}>Top 5 Barrios, Rubros y Localidades</h4>
+              <p style={styles.metricDesc}>Ranking de los 5 barrios con mayor presencia empresarial, cantidad de empresas por rubro/sector productivo y desglose por localidad.</p>
+            </div>
+            <div style={styles.metricItem}>
+              <h4 style={styles.metricTitle}>Dotación y Programas de Empleo</h4>
+              <p style={styles.metricDesc}>Tamaño de las empresas según rango de empleados (<code>1-5</code> a <code>+200</code>) y proporción de empresas interesadas en Programas Municipales de Empleo.</p>
+            </div>
+          </div>
+
+          <h3 style={styles.subSectionTitle}>3. Exportación CSV e Impresión PDF Unificada</h3>
           <p style={styles.paragraph}>
-            Asimismo, pulsando <strong>Imprimir PDF</strong>, se puede generar un documento físico o digital del reporte. La hoja de estilos de impresión ha sido optimizada con directivas `break-inside: avoid` en todas las tarjetas de indicadores principales. Esto garantiza que ningún bloque estadístico o lista se divida de manera incorrecta a través de los saltos de página del documento PDF.
+            Al presionar <strong>Exportar CSV</strong>, se descarga un archivo compatible con Excel que incluye todas las tablas estadísticas tanto de <strong>Postulantes</strong> como de <strong>Empresas</strong>. Asimismo, el botón <strong>Imprimir PDF</strong> formatea automáticamente ambas secciones con control de saltos de página (<code>break-inside: avoid</code>).
           </p>
         </div>
       )
     },
     {
       id: 'interfaz',
-      title: 'Tema e Interfaz',
+      title: 'Catálogos, Tema y Sistema',
       icon: <Settings size={18} />,
       content: (
         <div>
-          <h2 style={styles.sectionTitle}>Personalización y Comportamiento Visual</h2>
-          
-          <h3 style={styles.subSectionTitle}>1. Persistencia de Tema por Usuario</h3>
+          <h2 style={styles.sectionTitle}>Catálogos Administrables, Tema Visual y Ejecución</h2>
+
+          <h3 style={styles.subSectionTitle}>1. Administración de Catálogos del Sistema (⚙️ Configuración)</h3>
           <p style={styles.paragraph}>
-            La plataforma permite alternar de manera instantánea entre el <strong>Modo Claro</strong> y el <strong>Modo Oscuro</strong> mediante el icono de sol/luna de la cabecera superior.
-          </p>
-          <p style={styles.paragraph}>
-            Para optimizar la experiencia de uso de múltiples operarios:
+            Haciendo clic en el icono de engranaje (<code>Configuración</code>) en la esquina superior derecha, se abre el panel para administrar en vivo las listas desplegables del sistema:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}>La preferencia elegida se almacena individualmente en el navegador para cada cuenta de operador registrada (`theme_usuario`).</li>
-            <li style={{ marginBottom: '6px' }}>Al iniciar sesión, el sistema restaurará de forma automática el último tema que haya configurado ese usuario en particular.</li>
-            <li style={{ marginBottom: '0' }}>Por neutralidad estética de la pantalla de acceso, el formulario de <strong>Inicio de Sesión (Login)</strong> siempre se despliega en modo claro de forma predeterminada, restableciéndose también a este modo en cuanto se cierra sesión.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Rubros y Barrios:</strong> Se sincronizan directamente con la base de datos MySQL/MariaDB y se utilizan tanto en Postulantes como en Empresas.</li>
+            <li style={{ marginBottom: '0' }}><strong>Niveles Educativos y Estados Laborales:</strong> Permiten agregar nuevas opciones, renombrarlas en línea o eliminarlas según las necesidades operativas de la oficina.</li>
           </ul>
 
-          <h3 style={styles.subSectionTitle}>2. Estabilidad de Diseño (Scrollbar Gutter)</h3>
+          <h3 style={styles.subSectionTitle}>2. Persistencia de Tema Claro / Oscuro por Usuario</h3>
           <p style={styles.paragraph}>
-            Con el fin de evitar desplazamientos laterales indeseados en el contenido centrado cuando el listado de postulantes cambia de tamaño o de cantidad de filas al aplicar filtros (ocultando o mostrando el scroll vertical del navegador), la interfaz cuenta con una reserva de espacio fija y permanente para el canal del scroll vertical (`scrollbar-gutter: stable`), asegurando una visualización estática y uniforme.
+            La plataforma permite alternar entre <strong>Modo Claro</strong> y <strong>Modo Oscuro</strong> desde el icono de sol/luna de la cabecera. La preferencia se recuerda individualmente para cada usuario (<code>theme_usuario</code>) al iniciar sesión.
           </p>
 
-          <h3 style={styles.subSectionTitle}>3. Colores Dinámicos de los Rubros (Categorías)</h3>
+          <h3 style={styles.subSectionTitle}>3. Inicio Automático al Encender la Computadora</h3>
           <p style={styles.paragraph}>
-            Para facilitar una rápida identificación visual de los perfiles comerciales de los candidatos, cada etiqueta de Rubro recibe de manera automática una **paleta de colores pastel únicos y armoniosos** generados a partir de su ID. Estos colores se adaptan según el tema visual del sistema (claro u oscuro), garantizando que el texto mantenga un contraste adecuado y no afecte la accesibilidad visual.
+            El sistema está configurado para iniciarse automáticamente en segundo plano cada vez que se enciende la PC e inicia sesión en Windows, sin mostrar ventanas de consola:
           </p>
-
-          <h3 style={styles.subSectionTitle}>4. Acceso al Manual de Usuario en la Cabecera</h3>
-          <p style={styles.paragraph}>
-            El presente manual se encuentra integrado de manera directa en el encabezado (Header) de la aplicación web, simbolizado por el icono de un libro abierto (<code>BookOpen</code>). Esto permite acceder a toda la documentación de ayuda de forma instantánea y en una ventana modal emergente desde cualquier pantalla en la que se encuentre trabajando el operario, optimizando el flujo diario.
-          </p>
+          <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
+            <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible:</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> registrado en el arranque de Windows ejecuta <code>scripts/autostart-services.ps1</code>, levantando automáticamente <strong>MariaDB</strong> (puerto <code>3306</code>), el <strong>Backend Spring Boot</strong> precompilado (puerto <code>8080</code>) y el <strong>Frontend React/Vite</strong> (puerto <code>5173</code>).</li>
+            <li style={{ marginBottom: '6px' }}><strong>Control manual:</strong> Si se desea detener todos los servicios manualmente, basta con ejecutar <code>detener.bat</code> en la carpeta raíz del proyecto; para volver a iniciarlos manualmente, se puede ejecutar <code>iniciar.bat</code>.</li>
+            <li style={{ marginBottom: '0' }}><strong>Registros de diagnóstico (Logs):</strong> Las salidas de los tres servicios se guardan automáticamente en la carpeta <code>logs/</code> del proyecto.</li>
+          </ul>
         </div>
       )
     },
@@ -325,40 +365,38 @@ export default function UserManual() {
       icon: <Database size={18} />,
       content: (
         <div>
-          <h2 style={styles.sectionTitle}>Gestión de Cuentas de Operadores</h2>
+          <h2 style={styles.sectionTitle}>Gestión de Cuentas de Operadores y Seguridad</h2>
           <p style={styles.paragraph}>
-            El administrador principal del sistema (`SuperAdmin`) dispone de la pestaña de **Personal**
+            El administrador principal del sistema (<code>SuperAdmin</code>) dispone de la pestaña de <strong>Personal</strong>
             para coordinar el equipo de trabajo de la oficina:
           </p>
           <div style={styles.listSteps}>
             <div style={styles.stepItem}>
               <span style={{ ...styles.stepNumber, backgroundColor: '#7c3aed' }}>1</span>
               <div>
-                <strong>Crear Nuevos Usuarios:</strong> Permite registrar operadores ingresando su nombre, nombre de usuario, contraseña inicial y rol asignado.
+                <strong>Crear Nuevos Usuarios:</strong> Permite registrar operadores ingresando su nombre completo, nombre de usuario, contraseña inicial y rol asignado (<code>Entrevistador</code> o <code>SuperAdmin</code>).
               </div>
             </div>
             <div style={styles.stepItem}>
               <span style={{ ...styles.stepNumber, backgroundColor: '#7c3aed' }}>2</span>
               <div>
-                <strong>Cambiar Contraseñas:</strong> En caso de olvido o renovación de seguridad, el administrador puede modificar la clave de acceso de cualquier entrevistador.
+                <strong>Cambiar Contraseñas:</strong> En caso de olvido o renovación de seguridad, el administrador puede actualizar la clave de acceso de cualquier usuario.
               </div>
             </div>
             <div style={styles.stepItem}>
               <span style={{ ...styles.stepNumber, backgroundColor: '#7c3aed' }}>3</span>
               <div>
-                <strong>Bajas del Sistema (Soft-Delete):</strong> Permite inhabilitar la cuenta del personal de forma lógica. El operador inactivo ya no podrá iniciar sesión en el sistema, y su sesión y acceso serán revocados inmediatamente en su próxima petición al backend. Todo su historial de entrevistas guardadas se preservará de manera consistente.
+                <strong>Activar / Desactivar y Dar de Baja (Soft-Delete):</strong> Haciendo clic sobre el badge <code>ACTIVO / INACTIVO</code> o el botón de baja se puede suspender o inhabilitar el acceso de un operador de forma instantánea sin perder el historial de entrevistas ni de empresas que haya relevado.
               </div>
             </div>
           </div>
 
-          <h3 style={styles.subSectionTitle}>🔒 Políticas de Seguridad de Cuentas</h3>
-          <p style={styles.paragraph}>
-            Para resguardar el sistema, se aplican las siguientes reglas de seguridad de cuentas:
-          </p>
+          <h3 style={styles.subSectionTitle}>🔒 Políticas de Seguridad e Integridad de Datos</h3>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}><strong>Complejidad de Contraseñas:</strong> Al crear un usuario o cambiar una clave, la nueva contraseña debe cumplir obligatoriamente con una política de seguridad: mínimo 8 caracteres de longitud, al menos una letra mayúscula, un número y un carácter especial (ej. `!@#$%^&*`).</li>
-            <li style={{ marginBottom: '6px' }}><strong>Control de Intentos Fallidos (Rate Limiting):</strong> Si un usuario (o atacante) comete 5 intentos fallidos consecutivos de login en un periodo corto, el sistema bloqueará temporalmente la dirección IP de origen por 15 minutos para prevenir ataques de fuerza bruta.</li>
-            <li style={{ marginBottom: '0' }}><strong>Revocación de Sesiones:</strong> Al cambiar el estado de un usuario a inactivo o eliminarlo, el validador del backend interrumpe su acceso al instante, denegando el uso del token JWT previamente emitido.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Complejidad de Contraseñas:</strong> Mínimo 8 caracteres, al menos una letra mayúscula, un número y un carácter especial (ej. <code>!@#$%^&*</code>).</li>
+            <li style={{ marginBottom: '6px' }}><strong>Control de Intentos Fallidos (Rate Limiting):</strong> Bloqueo temporal por IP durante 15 minutos tras 5 intentos fallidos consecutivos de inicio de sesión.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Revocación Inmediata de Sesiones:</strong> Al desactivar o dar de baja un usuario, el backend invalida su acceso en tiempo real en la siguiente petición.</li>
+            <li style={{ marginBottom: '0' }}><strong>Protección de Secretos y Datos Sensibles:</strong> Las credenciales y claves JWT se gestionan exclusivamente mediante variables de entorno locales (<code>backend/.env</code>) y los volcados o respaldos locales (<code>database/backups_locales/</code>) están excluidos del repositorio público.</li>
           </ul>
         </div>
       )
@@ -372,7 +410,7 @@ export default function UserManual() {
         <BookOpen size={28} style={{ color: '#3b82f6' }} />
         <div>
           <h1 style={styles.title}>Manual de Usuario</h1>
-          <p style={styles.subtitle}>Aprende a navegar y utilizar las herramientas del Sistema de Bolsa de Trabajo.</p>
+          <p style={styles.subtitle}>Guía completa de uso y administración del Sistema de Bolsa de Trabajo — Oficina de Empleo San José.</p>
         </div>
       </div>
 

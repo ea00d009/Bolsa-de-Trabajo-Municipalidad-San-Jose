@@ -245,6 +245,161 @@ public class StatsService {
         cudStats.put("tipos", byTipoDiscapacidad);
         stats.put("cudStats", cudStats);
 
+        // =========================================================================
+        // 11. Estadísticas de Empresas Relevadas
+        // =========================================================================
+        Map<String, Object> empresaStats = new HashMap<>();
+
+        // 11.1 Total empresas activas
+        Long empTotal = (Long) entityManager.createQuery(
+                "SELECT COUNT(e) FROM Empresa e WHERE e.activo = true"
+        ).getSingleResult();
+        empresaStats.put("total", empTotal);
+
+        // 11.2 Agregadas última semana
+        Long empLastWeek = (Long) entityManager.createQuery(
+                "SELECT COUNT(e) FROM Empresa e WHERE e.activo = true AND (e.fechaRegistro >= :fechaDT OR e.fechaRelevamiento >= :fechaD)"
+        )
+                .setParameter("fechaDT", unaSemanaAtras)
+                .setParameter("fechaD", LocalDate.now().minusDays(7))
+                .getSingleResult();
+        empresaStats.put("lastWeek", empLastWeek);
+
+        // 11.3 Agregadas último mes
+        Long empLastMonth = (Long) entityManager.createQuery(
+                "SELECT COUNT(e) FROM Empresa e WHERE e.activo = true AND (e.fechaRegistro >= :fechaDT OR e.fechaRelevamiento >= :fechaD)"
+        )
+                .setParameter("fechaDT", unMesAtras)
+                .setParameter("fechaD", LocalDate.now().minusDays(30))
+                .getSingleResult();
+        empresaStats.put("lastMonth", empLastMonth);
+
+        // 11.4 Por Entrevistador (empresas relevadas por personal)
+        String nativeEmpInterviewer =
+                "SELECT p.nombre_completo, COUNT(emp.id) as cant " +
+                "FROM empresas emp " +
+                "JOIN personal p ON emp.id_personal_relevo = p.id " +
+                "WHERE emp.activo = true " +
+                "GROUP BY p.id, p.nombre_completo " +
+                "ORDER BY cant DESC";
+        List<Object[]> queryEmpInterviewer = entityManager.createNativeQuery(nativeEmpInterviewer).getResultList();
+        List<Map<String, Object>> empByInterviewer = new ArrayList<>();
+        for (Object[] row : queryEmpInterviewer) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", row[0] != null ? row[0].toString() : "Sin especificar");
+            map.put("count", row[1] != null ? ((Number) row[1]).longValue() : 0L);
+            empByInterviewer.add(map);
+        }
+        empresaStats.put("byInterviewer", empByInterviewer);
+
+        // 11.5 Por Interés en Incorporar Personal (Demanda Laboral)
+        List<Object[]> queryEmpInteres = entityManager.createQuery(
+                "SELECT e.interesIncorporar, COUNT(e) FROM Empresa e WHERE e.activo = true GROUP BY e.interesIncorporar"
+        ).getResultList();
+        Map<String, Long> byInteresIncorporar = new LinkedHashMap<>();
+        long buscandoPersonal = 0;
+        for (Object[] row : queryEmpInteres) {
+            String key = row[0] != null && !row[0].toString().trim().isEmpty() ? row[0].toString() : "SIN_DATO";
+            Long val = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            byInteresIncorporar.put(key, val);
+            if ("SI".equalsIgnoreCase(key)) {
+                buscandoPersonal += val;
+            }
+        }
+        empresaStats.put("byInteresIncorporar", byInteresIncorporar);
+        empresaStats.put("buscandoPersonal", buscandoPersonal);
+
+        // 11.6 Top 5 Barrios con más Empresas
+        String nativeEmpBarrios =
+                "SELECT b.nombre, COUNT(emp.id) as cant " +
+                "FROM empresas emp " +
+                "JOIN barrios b ON emp.id_barrio = b.id " +
+                "WHERE emp.activo = true " +
+                "GROUP BY b.id, b.nombre " +
+                "ORDER BY cant DESC " +
+                "LIMIT 5";
+        List<Object[]> queryEmpBarrios = entityManager.createNativeQuery(nativeEmpBarrios).getResultList();
+        List<Map<String, Object>> empByBarrio = new ArrayList<>();
+        for (Object[] row : queryEmpBarrios) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", row[0] != null ? row[0].toString() : "Sin barrio");
+            map.put("count", row[1] != null ? ((Number) row[1]).longValue() : 0L);
+            empByBarrio.add(map);
+        }
+        empresaStats.put("byBarrio", empByBarrio);
+
+        // 11.7 Por Rubro / Sector Productivo
+        String nativeEmpRubros =
+                "SELECT r.nombre, COUNT(emp.id) as cant " +
+                "FROM empresas emp " +
+                "JOIN rubros r ON emp.id_rubro = r.id " +
+                "WHERE emp.activo = true " +
+                "GROUP BY r.id, r.nombre " +
+                "ORDER BY cant DESC";
+        List<Object[]> queryEmpRubros = entityManager.createNativeQuery(nativeEmpRubros).getResultList();
+        List<Map<String, Object>> empByRubro = new ArrayList<>();
+        for (Object[] row : queryEmpRubros) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", row[0] != null ? row[0].toString() : "Sin rubro");
+            map.put("count", row[1] != null ? ((Number) row[1]).longValue() : 0L);
+            empByRubro.add(map);
+        }
+        empresaStats.put("byRubro", empByRubro);
+
+        // 11.8 Por Dotación (Cantidad de Empleados)
+        List<Object[]> queryEmpDotacion = entityManager.createQuery(
+                "SELECT e.cantidadEmpleados, COUNT(e) FROM Empresa e WHERE e.activo = true GROUP BY e.cantidadEmpleados"
+        ).getResultList();
+        Map<String, Long> rawDotacion = new HashMap<>();
+        for (Object[] row : queryEmpDotacion) {
+            String key = row[0] != null && !row[0].toString().trim().isEmpty() ? row[0].toString() : "Sin especificar";
+            Long val = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            rawDotacion.put(key, rawDotacion.getOrDefault(key, 0L) + val);
+        }
+        Map<String, Long> byCantidadEmpleados = new LinkedHashMap<>();
+        for (String rKey : List.of("1-5", "6-10", "11-50", "51-200", "+200", "Sin especificar")) {
+            if (rawDotacion.containsKey(rKey)) {
+                byCantidadEmpleados.put(rKey.equals("Sin especificar") ? rKey : rKey + " empleados", rawDotacion.get(rKey));
+            }
+        }
+        empresaStats.put("byCantidadEmpleados", byCantidadEmpleados);
+
+        // 11.9 Por Localidad
+        List<Object[]> queryEmpLocalidad = entityManager.createQuery(
+                "SELECT e.localidad, COUNT(e) FROM Empresa e WHERE e.activo = true GROUP BY e.localidad"
+        ).getResultList();
+        Map<String, Long> byLocalidad = new LinkedHashMap<>();
+        for (Object[] row : queryEmpLocalidad) {
+            String key = row[0] != null && !row[0].toString().trim().isEmpty() ? row[0].toString() : "San José";
+            Long val = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            byLocalidad.put(key, byLocalidad.getOrDefault(key, 0L) + val);
+        }
+        empresaStats.put("byLocalidad", byLocalidad);
+
+        // 11.10 Interés en Programas de Empleo
+        List<Object[]> queryEmpProg = entityManager.createQuery(
+                "SELECT e.interesProgramasEmpleo, COUNT(e) FROM Empresa e WHERE e.activo = true GROUP BY e.interesProgramasEmpleo"
+        ).getResultList();
+        long conInteresProg = 0;
+        long sinInteresProg = 0;
+        for (Object[] row : queryEmpProg) {
+            boolean hasInteres = false;
+            if (row[0] instanceof Boolean) {
+                hasInteres = (Boolean) row[0];
+            } else if (row[0] instanceof Number) {
+                hasInteres = ((Number) row[0]).intValue() == 1;
+            }
+            long val = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            if (hasInteres) conInteresProg += val;
+            else sinInteresProg += val;
+        }
+        Map<String, Object> programasStats = new HashMap<>();
+        programasStats.put("conInteres", conInteresProg);
+        programasStats.put("sinInteres", sinInteresProg);
+        empresaStats.put("programasStats", programasStats);
+
+        stats.put("empresaStats", empresaStats);
+
         return stats;
     }
 

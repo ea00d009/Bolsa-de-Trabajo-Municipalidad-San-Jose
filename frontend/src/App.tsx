@@ -586,6 +586,56 @@ export default function App() {
     Object.entries(stats.cudStats?.tipos || {}).forEach(([key, val]: any) => {
       csvContent += `"${key.replace(/_/g, ' ')}";${val}\n`;
     });
+    csvContent += "\n";
+
+    // Empresas
+    if (stats.empresaStats) {
+      const emp = stats.empresaStats;
+      csvContent += "MÉTRICAS GENERALES DE EMPRESAS\n";
+      csvContent += `Total de Empresas Relevadas;${emp.total || 0}\n`;
+      csvContent += `Relevadas última semana;${emp.lastWeek || 0}\n`;
+      csvContent += `Relevadas último mes;${emp.lastMonth || 0}\n`;
+      csvContent += `Buscan personal activamente;${emp.buscandoPersonal || 0}\n\n`;
+
+      csvContent += "DESEMPEÑO DE ENTREVISTADORES (EMPRESAS)\n";
+      csvContent += "Entrevistador;Cantidad de Empresas\n";
+      emp.byInterviewer?.forEach((item: any) => {
+        csvContent += `"${item.name}";${item.count}\n`;
+      });
+      csvContent += "\n";
+
+      csvContent += "DEMANDA DE PERSONAL (EMPRESAS)\n";
+      csvContent += "Estado de Demanda;Cantidad\n";
+      Object.entries(emp.byInteresIncorporar || {}).forEach(([key, val]: any) => {
+        csvContent += `"${key}";${val}\n`;
+      });
+      csvContent += "\n";
+
+      csvContent += "EMPRESAS POR RUBRO\n";
+      csvContent += "Rubro;Cantidad\n";
+      emp.byRubro?.forEach((item: any) => {
+        csvContent += `"${item.name}";${item.count}\n`;
+      });
+      csvContent += "\n";
+
+      csvContent += "TOP 5 BARRIOS CON MÁS EMPRESAS\n";
+      csvContent += "Barrio;Cantidad\n";
+      emp.byBarrio?.forEach((item: any) => {
+        csvContent += `"${item.name}";${item.count}\n`;
+      });
+      csvContent += "\n";
+
+      csvContent += "DOTACIÓN DE EMPLEADOS (EMPRESAS)\n";
+      csvContent += "Rango;Cantidad\n";
+      Object.entries(emp.byCantidadEmpleados || {}).forEach(([key, val]: any) => {
+        csvContent += `"${key}";${val}\n`;
+      });
+      csvContent += "\n";
+
+      csvContent += "INTERÉS EN PROGRAMAS DE EMPLEO MUNICIPAL\n";
+      csvContent += `Con interés;${emp.programasStats?.conInteres || 0}\n`;
+      csvContent += `Sin interés / No indicado;${emp.programasStats?.sinInteres || 0}\n`;
+    }
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -1642,6 +1692,19 @@ export default function App() {
                 </div>
               )}
 
+              {/* Encabezado Sección Postulantes */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                <div style={{ width: '6px', height: '26px', borderRadius: '4px', backgroundColor: '#3b82f6' }}></div>
+                <div>
+                  <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'var(--text-main-hex)', margin: 0 }}>
+                    Métricas de Postulantes
+                  </h2>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted-hex)', margin: '2px 0 0 0' }}>
+                    Indicadores generales, perfil sociolaboral, nivel educativo y distribución territorial de ciudadanos.
+                  </p>
+                </div>
+              </div>
+
               {/* Statistics Widgets */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '32px' }}>
                 {/* Card 1: Total */}
@@ -1960,6 +2023,358 @@ export default function App() {
 
                 </div>
               )}
+
+              {/* ========================================================================= */}
+              {/* SECCIÓN 2: MÉTRICAS DE EMPRESAS RELEVADAS (DEBAJO DE POSTULANTES)         */}
+              {/* ========================================================================= */}
+              {(() => {
+                const empStats = stats?.empresaStats || {
+                  total: 0,
+                  lastWeek: 0,
+                  lastMonth: 0,
+                  buscandoPersonal: 0,
+                  byInterviewer: [],
+                  byInteresIncorporar: {},
+                  byBarrio: [],
+                  byRubro: [],
+                  byCantidadEmpleados: {},
+                  byLocalidad: {},
+                  programasStats: { conInteres: 0, sinInteres: 0 }
+                };
+
+                const interesLabels: Record<string, { label: string; color: string }> = {
+                  SI: { label: 'Busca personal activamente', color: '#10b981' },
+                  A_FUTURO: { label: 'Interés en incorporar a futuro', color: '#f59e0b' },
+                  NO: { label: 'Sin búsquedas activas', color: '#ef4444' },
+                  SIN_DATO: { label: 'Sin dato especificado', color: '#64748b' }
+                };
+
+                return (
+                  <div style={{ marginTop: '56px', paddingTop: '40px', borderTop: '2px solid var(--border-hex)' }}>
+                    {/* Encabezado Sección Empresas */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                      <div style={{ width: '6px', height: '26px', borderRadius: '4px', backgroundColor: '#6366f1' }}></div>
+                      <div>
+                        <h2 style={{ fontSize: '21px', fontWeight: 700, color: 'var(--text-main-hex)', margin: 0 }}>
+                          Métricas de Empresas Relevadas
+                        </h2>
+                        <p style={{ fontSize: '13px', color: 'var(--text-muted-hex)', margin: '2px 0 0 0' }}>
+                          Relevamiento productivo local, demanda de personal, sectores económicos y programas de empleo.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* KPI Cards de Empresas (Misma estructura que Postulantes) */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+                      {/* Card 1: Total Empresas */}
+                      <div className="glass-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '24px', borderRadius: '16px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total de Empresas</span>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', color: 'var(--sidebar-item-active-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Building2 size={20} />
+                          </div>
+                        </div>
+                        {loadingStats ? (
+                          <Loader2 className="animate-spin" size={24} style={{ color: '#3b82f6' }} />
+                        ) : (
+                          <h2 style={{ fontSize: '33px', fontWeight: 800, color: 'var(--text-main-hex)' }}>
+                            {(empStats.total || 0).toLocaleString('es-AR')}
+                          </h2>
+                        )}
+                        <p style={{ fontSize: '13px', color: 'var(--text-muted-hex)', marginTop: '8px' }}>Total de empresas activas relevadas</p>
+                      </div>
+
+                      {/* Card 2: Relevadas Última Semana */}
+                      <div className="glass-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '24px', borderRadius: '16px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Agregadas Última Semana</span>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Plus size={20} />
+                          </div>
+                        </div>
+                        {loadingStats ? (
+                          <Loader2 className="animate-spin" size={24} style={{ color: '#10b981' }} />
+                        ) : (
+                          <h2 style={{ fontSize: '33px', fontWeight: 800, color: 'var(--text-main-hex)' }}>
+                            {empStats.lastWeek || 0}
+                          </h2>
+                        )}
+                        <p style={{ fontSize: '13px', color: '#10b981', fontWeight: 600, marginTop: '8px' }}>Nuevas empresas en los últimos 7 días</p>
+                      </div>
+
+                      {/* Card 3: Relevadas Último Mes */}
+                      <div className="glass-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '24px', borderRadius: '16px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Agregadas Último Mes</span>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#faf5ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Calendar size={20} />
+                          </div>
+                        </div>
+                        {loadingStats ? (
+                          <Loader2 className="animate-spin" size={24} style={{ color: '#8b5cf6' }} />
+                        ) : (
+                          <h2 style={{ fontSize: '33px', fontWeight: 800, color: 'var(--text-main-hex)' }}>
+                            {empStats.lastMonth || 0}
+                          </h2>
+                        )}
+                        <p style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 600, marginTop: '8px' }}>Nuevas empresas en los últimos 30 días</p>
+                      </div>
+
+                      {/* Card 4: Buscan Personal */}
+                      <div className="glass-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '24px', borderRadius: '16px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Buscan Personal</span>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fff7ed', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Briefcase size={20} />
+                          </div>
+                        </div>
+                        {loadingStats ? (
+                          <Loader2 className="animate-spin" size={24} style={{ color: '#ea580c' }} />
+                        ) : (
+                          <h2 style={{ fontSize: '33px', fontWeight: 800, color: 'var(--text-main-hex)' }}>
+                            {empStats.buscandoPersonal || 0}
+                          </h2>
+                        )}
+                        <p style={{ fontSize: '13px', color: '#ea580c', fontWeight: 600, marginTop: '8px' }}>Empresas con búsqueda activa de personal</p>
+                      </div>
+                    </div>
+
+                    {/* Grilla detallada de 2 columnas para Empresas */}
+                    {!loadingStats && stats && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '32px' }}>
+                        {/* Columna Izquierda (Empresas) */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                          {/* 1. Desempeño de Entrevistadores (Empresas) */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+                                <UserCheck size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Relevamiento por Entrevistador</h3>
+                            </div>
+                            <p style={{ fontSize: '15px', color: 'var(--text-muted-hex)', marginBottom: '16px' }}>Cantidad de empresas relevadas por cada miembro del personal.</p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              {empStats.byInterviewer && empStats.byInterviewer.length > 0 ? (() => {
+                                const totalRelevos = empStats.byInterviewer.reduce((acc: number, curr: any) => acc + curr.count, 0);
+                                return empStats.byInterviewer.map((item: any, idx: number) => {
+                                  const pct = totalRelevos > 0 ? Math.round((item.count / totalRelevos) * 100) : 0;
+                                  return (
+                                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', backgroundColor: 'var(--bg-app-hex)', borderRadius: '12px', border: '1px solid var(--border-hex)' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--primary-light)', color: 'var(--sidebar-item-active-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 600 }}>
+                                            {getInitials(item.name)}
+                                          </div>
+                                          <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main-hex)' }}>{item.name}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                          <span style={{ fontSize: '13px', color: 'var(--text-muted-hex)', fontWeight: 500 }}>{item.count} empresas</span>
+                                          <span style={{ backgroundColor: 'var(--primary-light)', color: 'var(--sidebar-item-active-color)', fontSize: '12px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px' }}>
+                                            {pct}%
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-hex)', borderRadius: '4px', overflow: 'hidden' }}>
+                                        <div className="animate-progress-bar" style={{ width: `${pct}%`, height: '100%', backgroundColor: getInterviewerBarColor(idx), borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+                                      </div>
+                                    </div>
+                                  );
+                                });
+                              })() : (
+                                <p style={{ fontSize: '14px', color: 'var(--text-muted-hex)', textAlign: 'center', padding: '12px' }}>No hay relevamientos asignados a personal.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 2. Distribución por Demanda de Personal (Interés en Incorporar) */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#fff7ed', color: '#ea580c' }}>
+                                <Briefcase size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Distribución por Demanda de Personal</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                              {Object.keys(empStats.byInteresIncorporar || {}).length > 0 ? (
+                                Object.entries(empStats.byInteresIncorporar || {}).map(([key, val]: any, idx) => {
+                                  const percentage = empStats.total > 0 ? Math.round((val / empStats.total) * 100) : 0;
+                                  const info = interesLabels[key] || { label: key.replace(/_/g, ' '), color: '#64748b' };
+                                  return (
+                                    <div key={idx}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 600, color: 'var(--text-main-hex)', marginBottom: '6px' }}>
+                                        <span>{info.label}</span>
+                                        <span style={{ color: 'var(--text-muted-hex)' }}>{val} ({percentage}%)</span>
+                                      </div>
+                                      <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '4px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: info.color, borderRadius: '4px' }}></div>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <p style={{ fontSize: '14px', color: 'var(--text-muted-hex)', textAlign: 'center' }}>Sin datos de demanda laboral.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 3. Interés en Programas Municipales de Empleo (Equivalente a CUD) */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: '#faf5ff', color: '#8b5cf6' }}>
+                                <Building2 size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Interés en Programas de Empleo</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                              <div style={{ flex: 1, padding: '16px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--border-hex)' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase' }}>Con Interés</div>
+                                <div style={{ fontSize: '24px', fontWeight: 800, color: '#10b981', marginTop: '6px' }}>
+                                  {empStats.programasStats?.conInteres || 0}
+                                </div>
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted-hex)', marginTop: '2px' }}>
+                                  {empStats.total > 0 ? ((empStats.programasStats?.conInteres || 0) / empStats.total * 100).toFixed(1) : 0}% del total
+                                </div>
+                              </div>
+                              <div style={{ flex: 1, padding: '16px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--border-hex)' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase' }}>Sin Interés / No Indicado</div>
+                                <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-main-hex)', marginTop: '6px' }}>
+                                  {empStats.programasStats?.sinInteres || 0}
+                                </div>
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted-hex)', marginTop: '2px' }}>
+                                  {empStats.total > 0 ? ((empStats.programasStats?.sinInteres || 0) / empStats.total * 100).toFixed(1) : 0}% del total
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Columna Derecha (Empresas) */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                          {/* 1. Top 5 Barrios con más Empresas */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'var(--bg-alt-hex)', color: 'var(--primary)' }}>
+                                <MapPin size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Top 5 Barrios con más Empresas</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                              {empStats.byBarrio && empStats.byBarrio.length > 0 ? (
+                                empStats.byBarrio.map((item: any, idx: number) => {
+                                  const maxVal = empStats.byBarrio[0].count;
+                                  const percentage = maxVal > 0 ? Math.round((item.count / maxVal) * 100) : 0;
+                                  return (
+                                    <div key={idx} style={{ position: 'relative', padding: '12px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-hex)' }}>
+                                      <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${percentage}%`, backgroundColor: 'var(--primary-light)', opacity: 0.15, zIndex: 1 }}></div>
+                                      <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-main-hex)' }}>{idx + 1}. {item.name}</span>
+                                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--sidebar-item-active-color)' }}>{item.count} empresas</span>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted-hex)', textAlign: 'center' }}>Sin datos de barrios en empresas.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 2. Empresas por Rubro / Sector Productivo */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+                                <Briefcase size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Empresas por Rubro / Sector</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              {empStats.byRubro && empStats.byRubro.length > 0 ? (
+                                empStats.byRubro.map((item: any, idx: number) => (
+                                  <div key={idx}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 600, color: 'var(--text-main-hex)', marginBottom: '6px' }}>
+                                      <span>{item.name}</span>
+                                      <span style={{ color: 'var(--sidebar-item-active-color)' }}>{item.count} emp.</span>
+                                    </div>
+                                    <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '3px', overflow: 'hidden' }}>
+                                      <div style={{ width: `${empStats.total > 0 ? Math.round((item.count / empStats.total) * 100) : 0}%`, height: '100%', backgroundColor: 'var(--sidebar-item-active-color)', borderRadius: '3px' }}></div>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <p style={{ fontSize: '15px', color: 'var(--text-muted-hex)', textAlign: 'center' }}>Sin datos de rubros en empresas.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 3. Distribución por Localidad */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'var(--bg-alt-hex)', color: 'var(--primary)' }}>
+                                <BarChart3 size={20} />
+                              </div>
+                              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Distribución por Localidad</h3>
+                            </div>
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                              {Object.keys(empStats.byLocalidad || {}).length > 0 ? (
+                                Object.entries(empStats.byLocalidad || {}).map(([key, val]: any, idx) => (
+                                  <div key={idx} style={{ flex: '1 1 120px', padding: '12px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '10px', border: '1px solid var(--border-hex)', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted-hex)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{key}</div>
+                                    <div style={{ fontSize: '21px', fontWeight: 800, color: 'var(--text-main-hex)', marginTop: '4px' }}>{val}</div>
+                                  </div>
+                                ))
+                              ) : (
+                                <p style={{ fontSize: '14px', color: 'var(--text-muted-hex)', textAlign: 'center', width: '100%' }}>Sin datos de localidad.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 4. Distribución por Dotación (Cantidad de Empleados) */}
+                          <div className="report-card" style={{ backgroundColor: 'var(--card-bg-hex)', padding: '28px', borderRadius: '20px', border: '1px solid hsl(var(--border))', boxShadow: 'var(--shadow-sm)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                              <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+                                <Users size={20} />
+                              </div>
+                              <div>
+                                <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Distribución por Dotación de Personal</h3>
+                                <p style={{ fontSize: '13px', color: 'var(--text-muted-hex)', marginTop: '2px' }}>
+                                  Tamaño de las empresas según rango de empleados
+                                </p>
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              {Object.keys(empStats.byCantidadEmpleados || {}).length > 0 ? (
+                                Object.entries(empStats.byCantidadEmpleados || {}).map(([range, countVal]: any, idx) => {
+                                  const percentage = empStats.total > 0 ? Math.round((countVal / empStats.total) * 100) : 0;
+                                  return (
+                                    <div key={idx}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: 'var(--text-main-hex)', marginBottom: '6px' }}>
+                                        <span>{range}</span>
+                                        <span style={{ color: 'var(--text-muted-hex)' }}>{countVal} ({percentage}%)</span>
+                                      </div>
+                                      <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '3px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${percentage}%`, height: '100%', backgroundColor: '#6366f1', borderRadius: '3px' }}></div>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <p style={{ fontSize: '14px', color: 'var(--text-muted-hex)', textAlign: 'center' }}>Sin datos de dotación cargados.</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
