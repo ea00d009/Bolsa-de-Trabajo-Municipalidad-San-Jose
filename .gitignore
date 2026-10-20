@@ -1,0 +1,59 @@
+HELP.md
+target/
+*.class
+*.jar
+*.war
+.classpath
+.project
+.settings/
+.idea/
+
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Local env files and configuration secrets
+.env
+.env.*
+!.env.example
+*.log
+logs/
+backend/application-local.properties
+backend/application-prod.properties
+
+# Database dumps, spreadsheets and local backups (Sensitive PII data)
+*.csv
+*.xlsx
+*.xls
+*dump*.sql
+*backup*.sql
+database/backups_locales/
