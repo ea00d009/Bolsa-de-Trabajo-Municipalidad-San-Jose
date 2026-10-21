@@ -1,8 +1,8 @@
 # Bolsa de Trabajo - Oficina de Empleo San José 🏢
 
-Este proyecto constituye el **Trabajo Final** para la **Tecnicatura Universitaria en Programación (TUP)** de la **Facultad Regional Concepción del Uruguay - Universidad Tecnológica Nacional (FRCU UTN)**. 
+Este proyecto constituye el **Trabajo Final** para la **Tecnicatura Universitaria en Programación (TUP)** de la **Facultad Regional Concepción del Uruguay - Universidad Tecnológica Nacional (FRCU UTN)**.
 
-Se trata de un sistema integral diseñado para la gestión de la Oficina de Empleo de la Municipalidad de la ciudad de San José, permitiendo administrar postulantes, empresas, vacantes, derivaciones laborales y capacitaciones profesionales.
+Se trata de una plataforma integral en producción diseñada para la gestión diaria de la **Oficina de Empleo de la Municipalidad de San José**, permitiendo administrar postulantes, currículums estandarizados, historial de entrevistas, relevamiento de empresas locales, estadísticas ejecutivas y administración del equipo de entrevistadores en red local (LAN).
 
 ---
 
@@ -13,33 +13,80 @@ Se trata de un sistema integral diseñado para la gestión de la Oficina de Empl
 
 ---
 
-## 🚀 Características Técnicas y Arquitectura del Sistema
+## 🚀 Arquitectura General y Stack Tecnológico
 
-El sistema implementa una arquitectura desacoplada de Cliente-Servidor estructurada de la siguiente manera:
+El sistema implementa una arquitectura desacoplada **Cliente-Servidor en 3 capas**, optimizada para operar con un servidor central en la oficina y múltiples terminales de entrevistadores conectadas a través de la red LAN:
 
 ```mermaid
-graph TD
-    A[Frontend: React + TypeScript] -->|Peticiones HTTPS Relativas| B[Servidor Proxy: Vite]
-    B -->|Proxy local:8080/api| C[Backend: Spring Boot]
-    C -->|Spring Data JPA| D[(Database: MySQL)]
+graph LR
+    subgraph Red_LAN_Oficina ["Red LAN Oficina de Empleo"]
+        PC1["💻 PC Entrevistador 1<br/>(Navegador)"]
+        PC2["💻 PC Entrevistador 2<br/>(Navegador)"]
+        PC3["💻 PC Administración<br/>(Navegador)"]
+    end
+
+    subgraph Servidor_Local ["Servidor Central (Host: sistema)"]
+        V["⚡ Frontend + Proxy LAN<br/>React 19 + Vite 8 (0.0.0.0:5173)"]
+        B["🛡️ Backend API REST<br/>Spring Boot 3.4.5 + Java 21 (8080)"]
+        DB[("🗄️ MariaDB / MySQL<br/>(Blindado 127.0.0.1:3306)")]
+        BK["💾 Backups Automáticos Diarios<br/>(database/backups_locales/)"]
+    end
+
+    PC1 & PC2 & PC3 -->|"HTTP (http://sistema:5173)"| V
+    V -->|"Proxy /api + X-Forwarded-For"| B
+    B -->|"Spring Data JPA / HikariCP"| DB
+    DB -.->|"mysqldump diario"| BK
 ```
 
-### 1. Backend (Spring Boot)
-* **Paquete Base Refacturado:** Toda la estructura de clases del backend ha sido refactorada desde el genérico `com.tuempresa.proyecto` al paquete corporativo representativo del municipio: `com.sanjose.bolsatrabajo`.
-* **Motor de Inyección:** Spring Boot 3.4.5 con soporte nativo para Java 21 hasta Java 25.
-* **Persistencia y Acceso a Datos:** Spring Data JPA con Hibernate, implementando mapeo objeto-relacional (ORM), transaccionalidad robusta y políticas de borrado lógico (*Soft Delete*) en entidades principales para mantener la integridad histórica.
-* **Seguridad y Control de Acceso:** Implementado mediante Spring Security y tokens estructurados firmados criptográficamente (JWT).
+### 1. Backend (Java 21 + Spring Boot 3.4.5)
+* **Arquitectura en Capas:** Separación estricta en `Controller`, `Service`, `Repository` y `Entity`/`DTO` bajo el paquete `com.sanjose.bolsatrabajo`.
+* **Persistencia y ORM:** **Spring Data JPA** con **Hibernate 6**, validación **Jakarta Bean Validation** (`spring-boot-starter-validation`), pool de conexiones **HikariCP** y políticas de borrado lógico (*Soft Delete*) con reactivación inteligente (*Upsert*).
+* **Seguridad Criptográfica:** **Spring Security 6** + **JWT** (`jjwt 0.11.5`) en cookies `HttpOnly` y hashing **BCrypt**.
+* **Testing Automatizado:** Suite completa de **28 tests automatizados** (unitarios y de integración) con **JUnit 5**, **Mockito** y **Spring MockMvc**.
 
-### 2. Frontend (React)
-* **Framework:** React 19 ejecutado sobre Vite 8 como empaquetador y TypeScript para garantizar la tipicidad estricta.
-* **Componentización:** Vanilla CSS utilizando variables HSL y temas personalizados (Modo Claro / Oscuro) con transiciones suaves de color.
-* **Generación de Reportes:** Integración de `html2pdf.js` para compilar y generar archivos PDF del currículum de postulantes en formato estándar A4.
+### 2. Frontend (React 19 + TypeScript 6 + Vite 8)
+* **Interfaz Moderna y Adaptativa:** **React 19** con tipado estricto en **TypeScript 6**, estilizado con variables CSS dinámicas y soporte de **Modo Claro / Oscuro** persistido individualmente por usuario.
+* **Sincronización Multi-Entrevistador en Vivo:** Refresco silencioso en segundo plano cada 30 segundos y al recuperar el foco de la ventana para mantener sincronizadas todas las terminales de la oficina sin recargar la página.
+* **Exportación Documental:** Generación nativa de Currículum Vitae en formato **A4 listo para imprimir o exportar a PDF** (`html2pdf.js`) y exportación de reportes estadísticos completos en **CSV (Excel)** y **PDF**.
 
 ---
 
-## 📊 Diagrama Entidad-Relación (DER) del Sistema
+## 🧩 Módulos Funcionales del Sistema
 
-La estructura relacional de la base de datos se detalla en el siguiente modelo de relaciones físicas:
+### 1. 👥 Gestión de Postulantes y Seguimiento de Entrevistas
+* **Búsqueda Instantánea y Filtros Combinados:** Filtrado simultáneo por nombre, apellido, DNI/CUIL, rubro de interés, estado laboral, rango de edad, certificado de discapacidad (CUD), nivel educativo y barrio.
+* **Reactivación Inteligente (*Upsert*):** Si se registra un ciudadano cuyo DNI o CUIL había sido dado de baja anteriormente, el sistema restaura automáticamente su legajo histórico y actualiza sus datos.
+* **Vista de CV Profesional A4 + Panel Privado del Entrevistador:**
+  * Hoja A4 con fotografía, datos de contacto, formación académica, experiencia laboral, habilidades e idiomas.
+  * **Autoguardado (*Autosave*):** La calificación por estrellas (`1 a 5`) y las observaciones internas del entrevistador se guardan automáticamente tras 1.5 segundos de inactividad y nunca se imprimen en el CV del ciudadano.
+  * **Línea de Tiempo de Visitas:** Registro cronológico de entrevistas con fecha, entrevistador responsable, objetivo, prioridad de inserción y estado del trámite.
+
+### 2. 🏭 Relevamiento de Empresas y Demanda Laboral
+* **Padrón Productivo Local:** Registro de comercios, PyMEs e industrias con formateo automático de **CUIT** (`XX-XXXXXXXX-X`), razón social, nombre de fantasía, rubro, dotación de empleados, dirección, barrio y datos de contacto directos (clic para llamar o enviar correo).
+* **Semáforo de Demanda de Personal:** Clasificación rápida por interés de contratación (`Busca personal`, `Interés a futuro`, `Sin búsquedas`, `Sin dato`) y adhesión a **Programas Municipales de Empleo**.
+* **Trazabilidad y Reactivación por CUIT:** Registra automáticamente qué entrevistador relevó cada empresa y restaura fichas inactivas si se vuelve a relevar un mismo CUIT.
+
+### 3. 📊 Panel de Informes y Estadísticas Unificado (`SuperAdmin`)
+Consolida en una única vista ejecutiva las métricas de **Postulantes** (sección superior) y las métricas de **Empresas Relevadas** (sección inferior):
+* **Métricas de Postulantes:** Total de activos, altas de los últimos 7 y 30 días, desempeño por entrevistador, distribución por estado laboral, Top 5 barrios, niveles educativos, género, rangos etarios con edad promedio y estadísticas de discapacidad (CUD y tipos).
+* **Métricas de Empresas Relevadas:** Total de empresas activas, altas de la última semana y último mes, total buscando personal activamente, relevamientos por entrevistador, distribución por demanda de personal, Top 5 barrios empresariales, empresas por rubro/sector, adhesión a programas de empleo, distribución por localidad y por dotación de empleados (`1-5` a `+200`).
+* **Exportación Unificada:** Descarga en 1 clic a **CSV (compatible con Excel)** incluyendo todas las tablas de postulantes y empresas, o impresión directa en **PDF**.
+
+### 4. 🔐 Administración de Personal y Cambio de Contraseñas Individual / Masivo (`SuperAdmin`)
+* **Gestión de Operadores:** Creación de cuentas con rol `Entrevistador` o `SuperAdmin`, activación/suspensión instantánea en vivo (`ACTIVO` / `INACTIVO`) y baja lógica sin pérdida de trazabilidad histórica en entrevistas o empresas.
+* **Cambio de Contraseñas Individual o Masivo por Rol:** Permite actualizar la clave de:
+  * **Un usuario individual** (entrevistador o administrador) elegido desde un selector.
+  * **Todos los Entrevistadores** en simultáneo (`ENTREVISTADORES`).
+  * **Todos los Administradores** en simultáneo (`ADMINISTRADORES`).
+  * **Todo el Personal del sistema** en bloque (`TODOS`).
+
+### 5. ⚙️ Catálogos Centralizados en Red y Manual Interactivo
+* **Catálogos Compartidos en el Servidor:** Administración en vivo de **Rubros**, **Barrios**, **Niveles Educativos** y **Estados Laborales** sincronizados centralizadamente en el backend para que todas las PCs de la red LAN compartan exactamente las mismas opciones.
+* **Manual de Usuario Integrado:** Guía interactiva paso a paso dentro de la propia aplicación, con buscador de temas y preguntas frecuentes (FAQ).
+
+---
+
+## 📊 Diagrama Entidad-Relación (DER) de la Base de Datos
 
 ```mermaid
 %%{init: {
@@ -226,7 +273,7 @@ erDiagram
     experiencia_laboral }o--|| ciudadanos : "registrada_para"
     ciudadano_rubros }o--|| ciudadanos : "asociado_a"
     ciudadano_rubros }o--|| rubros : "clasifica_en"
-    capacitaciones_ciudadano }o--|| ciudadanos : "inscrito_en"
+    capacitaciones_ciudadano }o--|| ciudadanos : "inscrito_a"
     capacitaciones_ciudadano }o--|| cursos_ofrecidos : "ofrecido_como"
     vacantes_laborales }o--|| empresas : "pertenece_a"
     empresas }o--o| rubros : "clasificada_en"
@@ -243,123 +290,59 @@ erDiagram
 
 ---
 
-## 🛡️ Arquitectura y Características de Seguridad (Security Hardening)
+## 🛡️ Seguridad y Hardening de Producción
 
-El sistema implementa medidas avanzadas de seguridad a nivel de código, de infraestructura y de base de datos, estructuradas y remediadas en base a auditorías exhaustivas de vulnerabilidades:
-
-### 1. Gestión de Sesión y Autenticación Criptográfica (JWT + Cookies)
-* **Cookies HttpOnly de Sesión Segura (SameSite=Lax) [SEC-05, SEC-10, SEC-11]:** Las credenciales de sesión (tokens JWT) se almacenan exclusivamente en cookies del navegador marcadas con las propiedades `HttpOnly` y `SameSite=Lax`. Esto garantiza que los scripts del frontend (JavaScript) no tengan acceso al token en memoria, anulando ataques de robo de sesión a través de Scripting en Sitios Cruzados (XSS) e impidiendo el envío no intencionado en peticiones externas (mitigación CSRF).
-* **Remoción del Token en Cuerpo de Respuesta [SEC-17]:** Al iniciar sesión con éxito, el servidor responde únicamente con la información básica del perfil del usuario (nombre, rol y usuario) y establece la cookie JWT de sesión de forma transparente, eliminando toda persistencia local del token en el cliente.
-* **Filtros JWT Desacoplados:** El componente [JwtFilter.java](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/java/com/sanjose/bolsatrabajo/filter/JwtFilter.java) analiza de manera automática tanto las cabeceras HTTP como las cookies de red para autenticar peticiones sin requerir código intrusivo.
-
-### 2. Control de Acceso y Hardening de Endpoints
-* **Control de Acceso Basado en Roles (RBAC) [SEC-06]:** Configurado centralmente en [SecurityConfig.java](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/java/com/sanjose/bolsatrabajo/config/SecurityConfig.java). Los accesos a estadísticas avanzadas y gestión de personal están restringidos únicamente a cuentas con rol `SuperAdmin`.
-* **Permisos Granulares en Catálogos:** Las lecturas de zonas/rubros están abiertas a roles de `Entrevistador`, mientras que las escrituras y modificaciones están protegidas exclusivamente para `SuperAdmin`.
-* **Desactivación Inmediata de Acceso [SEC-16]:** El servicio [UserDetailsServiceImpl.java](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/java/com/sanjose/bolsatrabajo/service/UserDetailsServiceImpl.java) comprueba en cada autenticación si la cuenta del personal posee el estado activo (`activo = true`) y no cuenta con registros de eliminación (`deletedAt == null`), interrumpiendo sesiones abiertas de forma instantánea si el administrador suspende al operario.
-
-### 3. Protección de Datos y Cuentas (Hardening de Entrada)
-* **Políticas de Complejidad de Contraseñas [SEC-14]:** Los endpoints de alta y modificación de claves en [UserController.java](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/java/com/sanjose/bolsatrabajo/controller/UserController.java) exigen requisitos estrictos de contraseña (longitud mínima de 8 caracteres, al menos una mayúscula, un número y un carácter especial).
-* **Limitación de Intentos (Rate Limiting) [SEC-13]:** Implementado en el login un sistema de bloqueo por IP que bloquea las solicitudes durante 15 minutos tras 5 intentos fallidos consecutivos, previniendo ataques de fuerza bruta o diccionario.
-* **Lista Blanca de Roles [SEC-15]:** Validación forzada contra un listado estático preaprobado en el backend antes de asignar un rol a un operador, previniendo la escalada de privilegios por inyección de roles no válidos.
-
-### 4. Privacidad de Datos de Postulantes (PII & Archivos)
-* **Enmascaramiento de Datos Sensibles (Logs) [SEC-18]:** El servicio [CiudadanoService.java](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/java/com/sanjose/bolsatrabajo/service/CiudadanoService.java) ofusca información de identificación personal (DNI y CUIL) en los logs del servidor (ej: `****5678`), evitando fugas de PII en auditorías de infraestructura.
-* **Restricción de Serialización de Contraseñas [SEC-04]:** Uso de anotaciones Jackson para definir el hash de la clave de usuario como propiedad únicamente de escritura (`Access.WRITE_ONLY`), evitando su exposición en payloads JSON de lectura.
-* **Validación de Carga de Archivos (Foto) [SEC-20]:** El campo fotografía es controlado para impedir ataques de denegación de servicio (DoS) por inyección de payloads de gran tamaño, validando cabeceras de tipo MIME de imagen (`data:image/`) y limitando el tamaño en Base64 a un máximo de 2 MB.
-
-### 5. Configuración e Infraestructura Segura
-* **Externalización de Credenciales y Secretos [SEC-08, SEC-09, SEC-02]:** Separación completa de secretos de base de datos y llaves de firma JWT en propiedades externas del entorno, requiriendo el uso de variables de entorno y eliminando contraseñas por defecto (como `admin`) del código fuente.
-* **Perfiles Locales y GitIgnore Seguro [SEC-19]:** Configuración de [.gitignore](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/.gitignore) estructurada para excluir de forma robusta dependencias locales (`node_modules/`), variables de entorno locales (`.env*`), propiedades del sistema de base de datos y archivos de logs del servidor.
+1. **Sesiones JWT en Cookies `HttpOnly` (`SameSite=Lax`):**
+   * Los tokens JWT nunca se exponen en el cuerpo JSON ni en `localStorage`; se gestionan exclusivamente mediante cookies `HttpOnly`, anulando vectores de robo de sesión vía XSS.
+2. **Control de Acceso Basado en Roles (RBAC):**
+   * Definido en [`SecurityConfig.java`](backend/src/main/java/com/sanjose/bolsatrabajo/config/SecurityConfig.java). Las rutas `/api/stats`, `/api/users/**`, bajas lógicas (`DELETE`) y escritura de catálogos exigen rol `SuperAdmin`.
+3. **Revocación Instantánea de Cuentas:**
+   * [`UserDetailsServiceImpl.java`](backend/src/main/java/com/sanjose/bolsatrabajo/service/UserDetailsServiceImpl.java) valida en cada petición que `activo == true` y `deletedAt == null`. Si un operador es desactivado, su sesión queda invalidada en el acto.
+4. **Rate Limiting por IP Real en Red LAN (`X-Forwarded-For`):**
+   * [`AuthController.java`](backend/src/main/java/com/sanjose/bolsatrabajo/controller/AuthController.java) bloquea durante 15 minutos a la IP que supere 5 intentos fallidos de login. Gracias a `xfwd: true` en [`vite.config.ts`](frontend/vite.config.ts), cada computadora de la red LAN se identifica de forma independiente.
+5. **Complejidad de Contraseñas y Lista Blanca de Roles:**
+   * [`UserController.java`](backend/src/main/java/com/sanjose/bolsatrabajo/controller/UserController.java) exige mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo especial, y valida los roles contra una lista blanca cerrada.
+6. **Aislamiento de Base de Datos (`127.0.0.1:3306`) y Protección de PII:**
+   * MariaDB se ejecuta con `--bind-address=127.0.0.1`, impidiendo conexiones directas externas desde la LAN.
+   * Los DNI y CUIL se ofuscan en los logs del servidor (`****5678`), y todos los volcados con datos reales (`database/backups_locales/`, `*.csv`, `.env`) están excluidos por `.gitignore`.
 
 ---
 
-## ⚙️ Parámetros de Configuración y Variables de Entorno
+## ⚙️ Operación en Producción Local (Servidor LAN, Auto-Inicio, Watchdog y Backups)
 
-El backend lee variables críticas de entorno o configuraciones del archivo [application.properties](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/src/main/resources/application.properties):
+El sistema cuenta con automatización completa para operar como servidor dedicado en Windows sin intervención técnica diaria:
 
-| Propiedad / Variable de Entorno | Propósito | Configuración Local / Recomendada |
-| :--- | :--- | :--- |
-| `spring.datasource.url` | Dirección JDBC de conexión de base de datos | `jdbc:mysql://localhost:3306/oficina_empleo_sanjose` |
-| `spring.datasource.username` | Usuario de la base de datos | `<TU_USUARIO_MYSQL>` |
-| `spring.datasource.password` | Contraseña de la base de datos | `<TU_CONTRASEÑA_MYSQL>` |
-| `app.security.jwt.secret` | Clave secreta para firmar tokens JWT (env: `JWT_SECRET`) | `<TU_SECRETO_JWT_SEGURO>` |
-| `app.security.superadmin.password`| Contraseña del superadmin inicial (env: `SUPERADMIN_PASSWORD`)| Generada aleatoriamente si no se provee |
-| `app.security.cors.allowed-origins`| Origen de peticiones frontend (env: `ALLOWED_ORIGINS`) | `http://localhost:5173` |
+| Script / Herramienta | Función Principal |
+| :--- | :--- |
+| **`scripts/iniciar-oculto.vbs`** | Lanzador silencioso registrado en el Inicio de Windows (`shell:startup`). Levanta todos los servicios al encender la PC sin abrir ventanas de consola. |
+| **`scripts/autostart-services.ps1`** | Orquestador que desactiva la suspensión energética de Windows, inicia **MariaDB** (`127.0.0.1:3306`), ejecuta el backup diario, inicia el **Backend** (`8080`) y publica el **Frontend** en la red LAN (`0.0.0.0:5173`). |
+| **Tarea `BolsaTrabajoWatchdog`** | Tarea programada de auto-recuperación (*Self-Healing*) que verifica cada **5 minutos** que los 3 servicios estén activos y levanta automáticamente cualquiera que se haya detenido. |
+| **`scripts/backup-db.ps1`** | Genera automáticamente un respaldo SQL diario en `database/backups_locales/backup_automatico_YYYY-MM-DD.sql` y conserva los últimos 30 días. |
+| **`respaldar-bd.bat`** | Genera un respaldo manual instantáneo (`backup_manual_YYYY-MM-DD_HH-mm.sql`) con un doble clic. |
+| **`actualizar.bat`** | Script de **Despliegue Continuo Local (CD)**: respalda la BD, descarga cambios con `git pull`, recompila el `.jar` de producción y reinicia los servicios automáticamente. |
+| **`iniciar.bat` / `detener.bat`** | Permiten iniciar o detener manualmente todos los servicios (pausando el *Watchdog* al detener). |
+
+### 🌐 Acceso desde las Computadoras de la Oficina (Red LAN)
+* **Desde la propia PC Servidor:** `http://localhost:5173`
+* **Desde las demás PCs de Entrevistadores (LAN):** **`http://sistema:5173`** *(o `http://<IP-LOCAL-SERVIDOR>:5173`)*
 
 ---
 
-## ⚡ Puesta en marcha rápida en una PC nueva (Sin nada instalado)
+## 🧪 Pruebas Automatizadas e Integración Continua (CI)
 
-Si clonás este repositorio en una computadora limpia (sin Java, sin Node.js, sin MySQL):
+Para ejecutar la suite completa de 28 pruebas unitarias y de integración del Backend:
 
-### Opción A — Con Antigravity (La más fácil 🤖)
-1. Abrí esta carpeta del proyecto en **Antigravity**.
-2. Escribile en el chat:
-   > *"Hola, acabo de clonar este proyecto en esta máquina limpia. Ejecutá el script de instalación automática y dejá corriendo el backend y el frontend."*
-3. Antigravity detectará el sistema operativo, ejecutará los instaladores desatendidos vía `winget`, configurará el entorno e iniciará los servicios por vos.
-
-### Opción B — Script Automático para Windows (1 Clic)
-1. Hacé doble clic en **`setup.bat`** (o ejecutá `powershell ./scripts/setup-windows.ps1`).
-   * Instala automáticamente **Node.js LTS** y **Microsoft OpenJDK 21** vía `winget`.
-   * Inicializa la configuración de base de datos y crea `backend/.env`.
-   * Ejecuta `npm install` en el frontend.
-2. Para iniciar todo el sistema: hacé doble clic en **`iniciar.bat`**.
-   * Levanta el Backend en puerto 8080 y el Frontend en puerto 5173.
-   * Abre automáticamente el navegador en [http://localhost:5173](http://localhost:5173).
-
-### Opción C — Con Docker Desktop (100% Aislado y Portátil)
-Si la máquina tiene **Docker Desktop**:
 ```bash
-docker compose up -d --build
+cd backend
+.\mvnw test
 ```
-* Levanta MySQL 8.0 (con la base de datos importada automáticamente desde `database/BD_oficinadeempleo.sql`).
-* Levanta el Backend Spring Boot en el puerto 8080.
-* Levanta el Frontend React en el puerto 5173 / 80.
-* No requiere instalar Java, Node ni MySQL en la computadora host.
 
----
+Para verificar el tipado estricto TypeScript y la compilación de producción del Frontend:
 
-## 🛠️ Requisitos e Instalación Manual del Proyecto
+```bash
+cd frontend
+npm run build
+```
 
-### Requisitos Previos
-* **Java 21+** (Compatible y verificado en JDK 25)
-* **Node.js 20+**
-* **MySQL 8.0+**
-* **Maven 3.9+** (o el wrapper `mvnw` incluido)
-
-### 1. Configuración de Base de Datos
-1. Crea la base de datos local `oficina_empleo_sanjose`.
-2. Ejecuta el script SQL [BD_oficinadeempleo.sql](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/database/BD_oficinadeempleo.sql) para inicializar las tablas maestros e integridad referencial.
-3. *(Opcional)* Si requieres migrar planillas previas o corregir codificaciones UTF-8 en datos heredados, puedes ejecutar los scripts del directorio `database`:
-   * [import_excel.py](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/database/import_excel.py)
-   * [fix_db_encoding.py](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/database/fix_db_encoding.py)
-
-### 2. Despliegue del Servidor Backend
-1. Ubícate en el directorio `backend/`.
-2. Compila el código del proyecto y corre las pruebas unitarias:
-   ```bash
-   # En Windows:
-   .\mvnw clean test
-   
-   # En Linux/Mac:
-   ./mvnw clean test
-   ```
-   > [!IMPORTANT]
-   > Si ejecutas las pruebas utilizando Java 25+, se requiere el argumento JVM de habilitación de agentes dinámicos de Mockito, el cual está configurado automáticamente en el [pom.xml](file:///c:/Users/alvar/OneDrive/Documentos/GitHub/backend/pom.xml) bajo la directiva `<argLine>-XX:+EnableDynamicAgentLoading</argLine>`.
-3. Inicia el servidor Spring Boot en puerto `8080`:
-   ```bash
-   .\mvnw spring-boot:run
-   ```
-
-### 3. Despliegue del Cliente Frontend
-1. Accede a la carpeta `frontend/`.
-2. Instala los paquetes y dependencias del sistema:
-   ```bash
-   npm install
-   ```
-3. Ejecuta el servidor local de desarrollo en puerto `5173`:
-   ```bash
-   npm run dev
-   ```
-4. Abre [http://localhost:5173](http://localhost:5173) en tu navegador e inicia sesión con el usuario `superadmin`.
-
+> [!NOTE]
+> En [`scripts/github-ci.yml`](scripts/github-ci.yml) se incluye la definición completa del pipeline de Integración Continua para GitHub Actions (auditoría de seguridad anti-PII, contenedor de servicio MySQL 8.0, ejecución de los 28 tests en Java 21 y build de producción en Node 22).
