@@ -32,7 +32,7 @@ graph LR
         BK["💾 Backups Automáticos Diarios<br/>(database/backups_locales/)"]
     end
 
-    PC1 & PC2 & PC3 -->|"HTTP (http://sistema:5173)"| V
+    PC1 & PC2 & PC3 -->|"HTTPS (https://sistema:5173)"| V
     V -->|"Proxy /api + X-Forwarded-For"| B
     B -->|"Spring Data JPA / HikariCP"| DB
     DB -.->|"mysqldump diario"| BK
@@ -45,7 +45,8 @@ graph LR
 * **Testing Automatizado:** Suite completa de **28 tests automatizados** (unitarios y de integración) con **JUnit 5**, **Mockito** y **Spring MockMvc**.
 
 ### 2. Frontend (React 19 + TypeScript 6 + Vite 8)
-* **Interfaz Moderna y Adaptativa:** **React 19** con tipado estricto en **TypeScript 6**, estilizado con variables CSS dinámicas y soporte de **Modo Claro / Oscuro** persistido individualmente por usuario.
+* **Interfaz Institucional Adaptativa (Regla 60-30-10 y Contraste WCAG AA/AAA):** **React 19** con tipado estricto en **TypeScript 6**, paleta institucional armonizada con la identidad de **SJTP (Trabajo y Producción)** y **SJ Ciudad**, logos adaptativos de alto contraste y soporte de **Modo Claro / Oscuro** persistido individualmente por usuario.
+* **Servidor HTTPS con Redirección Automática:** Publicación en red LAN bajo cifrado TLS (`https://sistema:5173`) con redirección transparente en el mismo puerto para peticiones `http://`.
 * **Sincronización Multi-Entrevistador en Vivo:** Refresco silencioso en segundo plano cada 30 segundos y al recuperar el foco de la ventana para mantener sincronizadas todas las terminales de la oficina sin recargar la página.
 * **Exportación Documental:** Generación nativa de Currículum Vitae en formato **A4 listo para imprimir o exportar a PDF** (`html2pdf.js`) y exportación de reportes estadísticos completos en **CSV (Excel)** y **PDF**.
 
@@ -292,8 +293,9 @@ erDiagram
 
 ## 🛡️ Seguridad y Hardening de Producción
 
-1. **Sesiones JWT en Cookies `HttpOnly` (`SameSite=Lax`):**
-   * Los tokens JWT nunca se exponen en el cuerpo JSON ni en `localStorage`; se gestionan exclusivamente mediante cookies `HttpOnly`, anulando vectores de robo de sesión vía XSS.
+1. **Cifrado HTTPS en Red LAN y Sesiones JWT en Cookies `HttpOnly` + `Secure` (`SameSite=Lax`):**
+   * El tráfico en la red de la oficina opera bajo **HTTPS** (`https://sistema:5173`) mediante una Autoridad de Certificación Raíz Local ([`scripts/ensure-https-cert.ps1`](scripts/ensure-https-cert.ps1)) con redirección automática de `http://` a `https://` en [`vite.config.ts`](frontend/vite.config.ts).
+   * Los tokens JWT nunca se exponen en el cuerpo JSON ni en `localStorage`; se gestionan exclusivamente mediante cookies `HttpOnly` con activación dinámica del atributo `Secure`, anulando vectores de robo de sesión vía XSS o intercepción en red.
 2. **Control de Acceso Basado en Roles (RBAC):**
    * Definido en [`SecurityConfig.java`](backend/src/main/java/com/sanjose/bolsatrabajo/config/SecurityConfig.java). Las rutas `/api/stats`, `/api/users/**`, bajas lógicas (`DELETE`) y escritura de catálogos exigen rol `SuperAdmin`.
 3. **Revocación Instantánea de Cuentas:**
@@ -320,11 +322,14 @@ El sistema cuenta con automatización completa para operar como servidor dedicad
 | **`scripts/backup-db.ps1`** | Genera automáticamente un respaldo SQL diario en `database/backups_locales/backup_automatico_YYYY-MM-DD.sql` y conserva los últimos 30 días. |
 | **`respaldar-bd.bat`** | Genera un respaldo manual instantáneo (`backup_manual_YYYY-MM-DD_HH-mm.sql`) con un doble clic. |
 | **`actualizar.bat`** | Script de **Despliegue Continuo Local (CD)**: respalda la BD, descarga cambios con `git pull`, recompila el `.jar` de producción y reinicia los servicios automáticamente. |
+| **`scripts/ensure-https-cert.ps1`** | Gestiona automáticamente la Autoridad de Certificación Raíz Local (`OficinaEmpleo-RootCA.crt`, 10 años) y el certificado TLS del servidor (`sistema.crt`, renovado automáticamente si cambia la IP local). |
+| **`certs/instalar-certificado-pc.bat`** | Instalador en 1 clic del certificado raíz para las PCs de entrevistadores de la red LAN, habilitando el candado de **Sitio Seguro** en Chrome / Edge. |
 | **`iniciar.bat` / `detener.bat`** | Permiten iniciar o detener manualmente todos los servicios (pausando el *Watchdog* al detener). |
 
-### 🌐 Acceso desde las Computadoras de la Oficina (Red LAN)
-* **Desde la propia PC Servidor:** `http://localhost:5173`
-* **Desde las demás PCs de Entrevistadores (LAN):** **`http://sistema:5173`** *(o `http://<IP-LOCAL-SERVIDOR>:5173`)*
+### 🌐 Acceso Seguro (HTTPS) desde las Computadoras de la Oficina (Red LAN)
+* **Desde la propia PC Servidor:** `https://localhost:5173` *(o `https://sistema:5173`)*
+* **Desde las demás PCs de Entrevistadores (LAN):** **`https://sistema:5173`** *(o `https://<IP-LOCAL-SERVIDOR>:5173`)*
+  * *(Nota: Si un navegador ingresa por `http://sistema:5173`, el servidor redirige automáticamente a `https://sistema:5173`. Para ver el candado de "Sitio Seguro" en una PC nueva de la oficina, ejecutar por única vez `certs\instalar-certificado-pc.bat`).*
 
 ---
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { User, Lock, ShieldAlert } from 'lucide-react';
+import logoSjtp from './assets/sjtp_logo.png';
+import logoSjtpDark from './assets/sjtp_logo_dark.png';
 import logoSjCiudad from './assets/sj_ciudad.png';
-import logoSafe from './assets/logo_safe.png';
-import logoSafeDark from './assets/logo_safe_dark.png';
+import logoSjCiudadDark from './assets/sj_ciudad_dark.png';
 
 interface LoginProps {
   onLoginSuccess: (token: string, userProfile?: any) => void;
@@ -86,9 +87,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '32px',
+          padding: '0 24px',
           border: '1px solid var(--border-hex)'
         }}>
-          <img src={logoSjCiudad} alt="SJ Ciudad" style={{ maxHeight: '60px', objectFit: 'contain' }} />
+          <img src={theme === 'dark' ? logoSjtpDark : logoSjtp} alt="SJTP Trabajo y Producción" style={{ maxHeight: '54px', maxWidth: '100%', objectFit: 'contain' }} />
         </div>
 
         <h2 style={{
@@ -182,7 +184,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       </div>
 
-      {/* Safe Software brand logo */}
+      {/* SJ Ciudad brand logo */}
       <div style={{
         position: 'absolute',
         bottom: '24px',
@@ -191,9 +193,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         pointerEvents: 'none'
       }}>
         <img
-          src={theme === 'dark' ? logoSafeDark : logoSafe}
-          alt="Safe Software"
-          style={{ maxHeight: '48px', objectFit: 'contain' }}
+          src={theme === 'dark' ? logoSjCiudadDark : logoSjCiudad}
+          alt="SJ Ciudad"
+          style={{ maxHeight: '42px', objectFit: 'contain' }}
         />
       </div>
     </div>

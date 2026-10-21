@@ -23,20 +23,25 @@ if not exist "backend\.env" (
     powershell -NoProfile -Command "$jwt = [guid]::NewGuid().ToString('N') + [guid]::NewGuid().ToString('N'); Set-Content -Path 'backend\.env' -Value \"DB_NAME=oficina_empleo_sanjose`r`nDB_USERNAME=root`r`nDB_PASSWORD=`r`nJWT_SECRET=$jwt`r`nALLOWED_ORIGINS=http://localhost:5173`r`nSWAGGER_ENABLED=false\" -Encoding UTF8"
 )
 
+:: Asegurar certificado SSL/HTTPS local
+if exist "scripts\ensure-https-cert.ps1" (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\ensure-https-cert.ps1" -InstallRootCA
+)
+
 echo.
 echo [1/2] Iniciando Backend Spring Boot (puerto 8080)...
 start "Backend - BolsaTrabajo" cmd /k "cd /d "%~dp0backend" && mvnw.cmd spring-boot:run"
 
 echo.
-echo [2/2] Iniciando Frontend React + Vite (puerto 5173)...
+echo [2/2] Iniciando Frontend React + Vite HTTPS (puerto 5173)...
 start "Frontend - BolsaTrabajo" cmd /k "cd /d "%~dp0frontend" && npm run dev"
 
 echo.
 echo Esperando a que el servidor inicialice...
 timeout /t 5 /nobreak > nul
 
-echo Abriendo navegador en http://localhost:5173...
-start http://localhost:5173
+echo Abriendo navegador en https://localhost:5173...
+start https://localhost:5173
 
 echo.
 echo ======================================================

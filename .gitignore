@@ -59,3 +59,9 @@ catalogos-config.json
 *dump*.sql
 *backup*.sql
 database/backups_locales/
+
+# Private SSL keys and local server certificates
+certs/*.pfx
+certs/*.key
+certs/*.crt
+frontend/public/OficinaEmpleo-RootCA.crt

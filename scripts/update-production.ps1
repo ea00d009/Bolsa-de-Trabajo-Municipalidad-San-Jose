@@ -49,7 +49,7 @@ for ($i = 0; $i -lt 25; $i++) {
     if ($ok3306 -and $ok8080 -and $ok5173) {
         Write-Host ""
         Write-Host "=================================================================" -ForegroundColor Green
-        Write-Host " ACTUALIZACIÓN COMPLETADA Y SERVICIOS ACTIVOS (http://sistema:5173)" -ForegroundColor Green
+        Write-Host " ACTUALIZACIÓN COMPLETADA Y SERVICIOS ACTIVOS (https://sistema:5173)" -ForegroundColor Green
         Write-Host "=================================================================" -ForegroundColor Green
         exit 0
     }

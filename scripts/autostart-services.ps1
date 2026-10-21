@@ -87,7 +87,13 @@ if (-not (Test-PortListening 8080)) {
     }
 }
 
-# 4. Iniciar Frontend React + Vite en modo LAN (0.0.0.0:5173)
+# 3.b Asegurar certificados SSL/HTTPS locales vigentes para la red LAN
+$certScript = Join-Path $RepoRoot "scripts\ensure-https-cert.ps1"
+if (Test-Path $certScript) {
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $certScript -InstallRootCA | Out-Null
+}
+
+# 4. Iniciar Frontend React + Vite en modo LAN HTTPS (0.0.0.0:5173)
 if (-not (Test-PortListening 5173)) {
     $frontendDir = Join-Path $RepoRoot "frontend"
     $npmCmd      = Join-Path $NodeDir "npm.cmd"

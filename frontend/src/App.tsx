@@ -5,9 +5,10 @@ import CandidateForm from './CandidateForm';
 import CandidateCV from './CandidateCV';
 import UserManual from './UserManual';
 import Empresas from './Empresas';
+import logoSjtp from './assets/sjtp_logo.png';
+import logoSjtpDark from './assets/sjtp_logo_dark.png';
 import logoSjCiudad from './assets/sj_ciudad.png';
-import logoSafe from './assets/logo_safe.png';
-import logoSafeDark from './assets/logo_safe_dark.png';
+import logoSjCiudadDark from './assets/sj_ciudad_dark.png';
 import { 
   LogOut, Users, FileText, UserPlus, Loader2, AlertCircle, 
   Briefcase, MapPin, GraduationCap, UserCheck, Calendar, Clock, BarChart3,
@@ -1327,7 +1328,7 @@ export default function App() {
             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             title="Volver al Listado de Postulantes"
           >
-            <img src={logoSjCiudad} alt="SJ Ciudad" style={{ maxHeight: '42px', objectFit: 'contain' }} />
+            <img src={theme === 'dark' ? logoSjtpDark : logoSjtp} alt="SJTP Trabajo y Producción" style={{ maxHeight: '38px', maxWidth: '185px', objectFit: 'contain' }} />
           </button>
           <button
             onClick={() => setSidebarCollapsed(true)}
@@ -1406,16 +1407,17 @@ export default function App() {
         </nav>
 
         <div style={{ 
-          padding: '0 24px 10px 24px', 
+          padding: '0 24px 20px 24px', 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center'
         }}>
           <img 
-            src={theme === 'dark' ? logoSafeDark : logoSafe} 
-            alt="Safe Software" 
+            src={theme === 'dark' ? logoSjCiudadDark : logoSjCiudad} 
+            alt="SJ Ciudad" 
             style={{ 
-              maxHeight: '130px', 
+              maxHeight: '42px', 
+              maxWidth: '170px',
               width: '100%', 
               objectFit: 'contain',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -1423,7 +1425,7 @@ export default function App() {
               transformOrigin: 'bottom center'
             }} 
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.5)';
+              e.currentTarget.style.transform = 'scale(1.12)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
@@ -1478,9 +1480,9 @@ export default function App() {
                   title="Volver al Listado de Postulantes"
                 >
                   <img 
-                    src={logoSjCiudad} 
-                    alt="SJ Ciudad" 
-                    style={{ maxHeight: '36px', objectFit: 'contain', userSelect: 'none' }} 
+                    src={theme === 'dark' ? logoSjtpDark : logoSjtp} 
+                    alt="SJTP Trabajo y Producción" 
+                    style={{ maxHeight: '34px', maxWidth: '190px', objectFit: 'contain', userSelect: 'none' }} 
                   />
                 </button>
                 <span style={{ color: 'var(--border-hex)', fontSize: '16px', userSelect: 'none' }}>|</span>
@@ -1522,8 +1524,8 @@ export default function App() {
               }}
               className="btn-manual-bounce"
               style={{
-                background: 'none',
-                border: 'none',
+                background: activeTab === 'manual' ? 'var(--sidebar-item-active-bg)' : 'none',
+                border: activeTab === 'manual' ? '1px solid rgba(0, 172, 233, 0.35)' : '1px solid transparent',
                 cursor: 'pointer',
                 color: activeTab === 'manual' ? 'var(--sidebar-item-active-color)' : 'var(--text-muted-hex)',
                 padding: '8px',
@@ -1534,8 +1536,12 @@ export default function App() {
                 transition: 'var(--transition)',
                 marginRight: '8px'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-alt-hex)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'manual') e.currentTarget.style.backgroundColor = 'var(--bg-alt-hex)';
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'manual') e.currentTarget.style.backgroundColor = 'transparent';
+              }}
               title="Manual de Usuario"
             >
               <BookOpen size={18} />

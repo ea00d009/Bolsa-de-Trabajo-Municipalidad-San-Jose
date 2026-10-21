@@ -342,20 +342,24 @@ export default function UserManual() {
             <li style={{ marginBottom: '0' }}><strong>Niveles Educativos y Estados Laborales:</strong> Se almacenan centralizadamente en el servidor (<code>/api/catalogos-config</code>) para que todas las computadoras de la red LAN compartan exactamente las mismas opciones.</li>
           </ul>
 
-          <h3 style={styles.subSectionTitle}>2. Persistencia de Tema Claro / Oscuro por Usuario</h3>
+          <h3 style={styles.subSectionTitle}>2. Identidad Visual Institucional y Tema Claro / Oscuro por Usuario</h3>
           <p style={styles.paragraph}>
-            La plataforma permite alternar entre <strong>Modo Claro</strong> y <strong>Modo Oscuro</strong> desde el icono de sol/luna de la cabecera. La preferencia se recuerda individualmente para cada usuario (<code>theme_usuario</code>) al iniciar sesión.
+            La interfaz implementa la identidad visual de <strong>SJTP (Trabajo y Producción)</strong> y <strong>SJ Ciudad</strong> bajo la normativa de diseño web <strong>60-30-10</strong> y relaciones de contraste <strong>WCAG AA/AAA</strong> (60% superficies neutras matizadas para evitar fatiga visual, 30% azul marino/celeste institucional y 10% acentos focales).
+          </p>
+          <p style={styles.paragraph}>
+            Desde el icono de sol/luna de la cabecera se puede alternar en vivo entre <strong>Modo Claro</strong> y <strong>Modo Oscuro</strong>: tanto la paleta como los logos institucionales se adaptan automáticamente para mantener máximo contraste, recordando la preferencia individual de cada operador (<code>theme_usuario</code>).
           </p>
 
-          <h3 style={styles.subSectionTitle}>3. Operación en Red LAN, Inicio Automático y Respaldos</h3>
+          <h3 style={styles.subSectionTitle}>3. Operación Segura en Red LAN (HTTPS), Inicio Automático y Respaldos</h3>
           <p style={styles.paragraph}>
-            El sistema está preparado para funcionar como servidor central de la oficina, permitiendo que varios entrevistadores trabajen en simultáneo desde sus propias computadoras:
+            El sistema opera como servidor central de la oficina, permitiendo que múltiples entrevistadores trabajen en simultáneo desde sus computadoras con conexión cifrada:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}><strong>Acceso desde otras PCs de la Red LAN:</strong> Cualquier computadora conectada a la misma red de la oficina puede ingresar abriendo el navegador en <code>http://sistema:5173</code> (o usando la IP local de esta PC seguida de <code>:5173</code>). Los listados de Postulantes y Empresas se sincronizan automáticamente cada 30 segundos y al recuperar el foco de la ventana.</li>
-            <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible y sin suspensión:</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> ejecuta <code>scripts/autostart-services.ps1</code> al iniciar Windows, levantando <strong>MariaDB</strong> blindado en <code>127.0.0.1:3306</code>, el <strong>Backend Spring Boot</strong> en el puerto <code>8080</code> y el <strong>Frontend</strong> abierto a la LAN en <code>0.0.0.0:5173</code>, además de desactivar la suspensión automática de Windows mientras la PC está enchufada.</li>
-            <li style={{ marginBottom: '6px' }}><strong>Respaldos automáticos y manuales de Base de Datos:</strong> Cada día al iniciar el sistema se genera automáticamente una copia de seguridad completa en <code>database/backups_locales/backup_automatico_YYYY-MM-DD.sql</code> (conservando los últimos 30 días). También se puede generar un respaldo instantáneo en cualquier momento haciendo doble clic en <code>respaldar-bd.bat</code>.</li>
-            <li style={{ marginBottom: '0' }}><strong>Control manual y Logs:</strong> Para detener todos los servicios manualmente basta con ejecutar <code>detener.bat</code>; para iniciarlos, <code>iniciar.bat</code>. Los registros técnicos se guardan en <code>logs/</code>.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Acceso Seguro HTTPS en Red LAN y Redirección Automática:</strong> Las terminales de la oficina ingresan mediante <code>https://sistema:5173</code> (si alguien escribe <code>http://sistema:5173</code>, el servidor redirige automáticamente a <code>https://</code>). El script <code>scripts/ensure-https-cert.ps1</code> mantiene vigente la Autoridad Raíz Local (10 años) y renueva automáticamente el certificado SSL del servidor si el router cambia la IP local.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Instalador de Certificado para PCs de Entrevistadores (1 clic):</strong> Para que cualquier computadora nueva de la oficina muestre el candado de <em>Sitio Seguro</em> sin advertencias en Chrome o Edge, basta con ejecutar una única vez en esa PC el archivo <code>certs/instalar-certificado-pc.bat</code> (también descargable desde <code>https://sistema:5173/instalar-certificado-pc.bat</code>).</li>
+            <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible y Auto-Recuperación (Watchdog):</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> ejecuta <code>scripts/autostart-services.ps1</code> al encender la PC, levantando <strong>MariaDB</strong> blindado en <code>127.0.0.1:3306</code>, el <strong>Backend Spring Boot</strong> en <code>8080</code> y el <strong>Frontend HTTPS</strong> en <code>0.0.0.0:5173</code>. Además, la tarea programada <code>BolsaTrabajoWatchdog</code> verifica cada 5 minutos que los 3 servicios estén activos y los levanta automáticamente si alguno se detiene.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Respaldos automáticos y manuales de Base de Datos:</strong> Cada día al iniciar el sistema se genera una copia de seguridad en <code>database/backups_locales/backup_automatico_YYYY-MM-DD.sql</code> (conservando 30 días), y puede ejecutarse un respaldo instantáneo en cualquier momento con doble clic en <code>respaldar-bd.bat</code>.</li>
+            <li style={{ marginBottom: '0' }}><strong>Actualización en 1 clic y Control manual:</strong> Ejecutando <code>actualizar.bat</code> el servidor respalda la base de datos, descarga las últimas mejoras desde GitHub (<code>git pull</code>), recompila el sistema y reinicia los servicios. Para detener o iniciar manualmente todos los procesos se dispone de <code>detener.bat</code> e <code>iniciar.bat</code>.</li>
           </ul>
         </div>
       )
@@ -408,7 +412,20 @@ export default function UserManual() {
     <div className="fade-in" style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <BookOpen size={28} style={{ color: '#3b82f6' }} />
+        <div style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg, rgba(4, 26, 114, 0.12) 0%, rgba(0, 172, 233, 0.18) 100%)',
+          border: '1px solid rgba(0, 172, 233, 0.28)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#00ace9',
+          flexShrink: 0
+        }}>
+          <BookOpen size={26} />
+        </div>
         <div>
           <h1 style={styles.title}>Manual de Usuario</h1>
           <p style={styles.subtitle}>Guía completa de uso y administración del Sistema de Bolsa de Trabajo — Oficina de Empleo San José.</p>
@@ -422,18 +439,17 @@ export default function UserManual() {
             <button
               key={section.id}
               onClick={() => setActiveSection(section.id)}
+              className={`sidebar-item ${activeSection === section.id ? 'active' : ''}`}
               style={{
-                ...styles.navItem,
-                backgroundColor: activeSection === section.id ? 'var(--bg-alt-hex)' : 'transparent',
-                color: activeSection === section.id ? 'var(--text-main-hex)' : 'var(--text-muted-hex)',
-                fontWeight: activeSection === section.id ? 600 : 500,
+                justifyContent: 'space-between',
+                borderRadius: '10px',
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {section.icon}
                 {section.title}
               </span>
-              <ChevronRight size={16} style={{ opacity: activeSection === section.id ? 1 : 0, transition: 'var(--transition)' }} />
+              <ChevronRight size={16} style={{ opacity: activeSection === section.id ? 1 : 0, color: 'var(--sidebar-item-active-color)', transition: 'var(--transition)' }} />
             </button>
           ))}
         </div>

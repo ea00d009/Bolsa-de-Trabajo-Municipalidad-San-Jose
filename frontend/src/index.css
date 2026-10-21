@@ -1,44 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: 217 91% 60%;
-  --primary-hover: 217 91% 50%;
-  --primary-light: 217 91% 95%;
-  --secondary: 222 47% 11%;
-  --bg-app: 210 40% 98%;
+  /* Paleta Institucional SJTP + SJ Ciudad (Regla 60-30-10 y Contraste WCAG) */
+  --brand-navy: #041a72;
+  --brand-cyan: #00ace9;
+  --brand-coral: #e54360;
+
+  --primary: 221 83% 48%;
+  --primary-hover: 224 85% 40%;
+  --primary-light: #e0f2fe;
+  --secondary: 224 64% 14%;
+  --bg-app: 216 50% 97%;
   --card-bg: 0 0% 100%;
-  --text-main: 215 25% 27%;
-  --text-muted: 215 16% 47%;
-  --border: 214 32% 91%;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --text-main: 224 55% 16%;
+  --text-muted: 218 22% 43%;
+  --border: 215 38% 89%;
+  --shadow-sm: 0 1px 3px 0 rgba(4, 26, 114, 0.06);
+  --shadow: 0 10px 18px -4px rgba(4, 26, 114, 0.07), 0 4px 6px -2px rgba(4, 26, 114, 0.03);
+  --shadow-lg: 0 20px 28px -6px rgba(4, 26, 114, 0.11), 0 10px 12px -5px rgba(4, 26, 114, 0.05);
   --radius: 12px;
   --radius-sm: 8px;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Estado colors */
-  --color-entrevista: 217 91% 60%;
-  --color-contratado: 142 76% 36%;
-  --color-recibido: 215 16% 47%;
-  --color-rechazado: 346 84% 61%;
+  --color-entrevista: 201 96% 42%;
+  --color-contratado: 152 76% 36%;
+  --color-recibido: 218 22% 45%;
+  --color-rechazado: 349 76% 58%;
 
-  /* Direct CSS/Inline variables */
-  --bg-app-hex: #f8fafc;
+  /* Direct CSS/Inline variables (60% Neutros matizados para cero fatiga visual) */
+  --bg-app-hex: #f2f6fc;
   --card-bg-hex: #ffffff;
-  --text-main-hex: #0f172a;
-  --text-muted-hex: #475569;
-  --border-hex: #e2e8f0;
-  --bg-alt-hex: #f1f5f9;
-  --advanced-filters-bg: #f9fafb;
-  --advanced-filters-border: #e5e7eb;
-  --bg-table-header: #fafbfc;
-  --login-bg: radial-gradient(circle at 50% 50%, #f1f5f9 0%, #e2e8f0 100%);
-  --sidebar-item-hover: #f8fafc;
-  --sidebar-item-active-bg: #eff6ff;
-  --sidebar-item-active-color: #3b82f6;
+  --text-main-hex: #0c1738;
+  --text-muted-hex: #475877;
+  --border-hex: #dbe4f2;
+  --bg-alt-hex: #eaf0fa;
+  --advanced-filters-bg: #f6f9fe;
+  --advanced-filters-border: #d8e3f2;
+  --bg-table-header: #f4f7fc;
+  --login-bg:
+    radial-gradient(circle at 15% 20%, rgba(0, 172, 233, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(229, 67, 96, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, #f4f7fc 0%, #e4ecf7 100%);
+  --sidebar-item-hover: #f1f6fd;
+  --sidebar-item-active-bg: #eaf3ff;
+  --sidebar-item-active-color: #0b3b8c;
   --sidebar-bg: #ffffff;
   --header-bg: #ffffff;
+  --brand-top-stripe: linear-gradient(90deg, #041a72 0%, #00ace9 52%, #e54360 100%);
 
   /* Form Accents */
   --accent-orange: #d97706;
@@ -50,47 +59,51 @@
   --accent-purple-border: rgba(139, 92, 246, 0.5);
 
   /* Rubro tag palette */
-  --rubro-bg: rgba(139, 92, 246, 0.08);
-  --rubro-text: #7c3aed;
+  --rubro-bg: rgba(0, 172, 233, 0.10);
+  --rubro-text: #0369a1;
   --rubro-popover-bg: #ffffff;
-  --rubro-popover-border: #e2e8f0;
-  --rubro-popover-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.1);
+  --rubro-popover-border: #dbe4f2;
+  --rubro-popover-shadow: 0 20px 25px -5px rgba(4, 26, 114, 0.15), 0 8px 10px -6px rgba(4, 26, 114, 0.08);
 
   /* Row zebra */
-  --row-zebra: rgba(241, 245, 249, 0.5);
-  --row-hover: #f1f5f9;
+  --row-zebra: rgba(234, 240, 250, 0.55);
+  --row-hover: #eaf1fb;
 }
 
 .dark-theme {
-  --primary: 217 91% 65%;
-  --primary-hover: 217 91% 55%;
-  --primary-light: 217 91% 18%;
+  --primary: 199 95% 52%;
+  --primary-hover: 199 95% 45%;
+  --primary-light: rgba(56, 189, 248, 0.16);
   --secondary: 210 40% 98%;
-  --bg-app: 222 47% 11%;
-  --card-bg: 223 47% 16%;
+  --bg-app: 224 54% 9%;
+  --card-bg: 223 48% 14%;
   --text-main: 210 40% 98%;
-  --text-muted: 215 16% 70%;
-  --border: 223 47% 24%;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --text-muted: 215 25% 74%;
+  --border: 221 43% 23%;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.55);
+  --shadow: 0 10px 18px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 20px 28px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
 
   /* Direct CSS/Inline variables */
-  --bg-app-hex: #0b0f19;
-  --card-bg-hex: #131b2e;
+  --bg-app-hex: #090e1d;
+  --card-bg-hex: #111a30;
   --text-main-hex: #f8fafc;
-  --text-muted-hex: #94a3b8;
-  --border-hex: #1e293b;
-  --bg-alt-hex: #1e293b;
-  --advanced-filters-bg: #1f2937;
-  --advanced-filters-border: #374151;
-  --bg-table-header: #1e293b;
-  --login-bg: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-  --sidebar-item-hover: #1e293b;
-  --sidebar-item-active-bg: #1e3a8a;
-  --sidebar-item-active-color: #60a5fa;
-  --sidebar-bg: #131b2e;
-  --header-bg: #131b2e;
+  --text-muted-hex: #9fb0c9;
+  --border-hex: #1f2f50;
+  --bg-alt-hex: #17233f;
+  --advanced-filters-bg: #15203b;
+  --advanced-filters-border: #253860;
+  --bg-table-header: #16223d;
+  --login-bg:
+    radial-gradient(circle at 15% 20%, rgba(0, 172, 233, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(229, 67, 96, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, #131e38 0%, #090e1d 100%);
+  --sidebar-item-hover: #16223d;
+  --sidebar-item-active-bg: rgba(56, 189, 248, 0.12);
+  --sidebar-item-active-color: #38bdf8;
+  --sidebar-bg: #0e1629;
+  --header-bg: #0e1629;
+  --brand-top-stripe: linear-gradient(90deg, #00ace9 0%, #3b82f6 50%, #e54360 100%);
 
   /* Form Accents */
   --accent-orange: #fbbf24;
@@ -102,15 +115,15 @@
   --accent-purple-border: rgba(167, 139, 250, 0.5);
 
   /* Rubro tag palette */
-  --rubro-bg: rgba(167, 139, 250, 0.12);
-  --rubro-text: #a78bfa;
-  --rubro-popover-bg: #1e293b;
-  --rubro-popover-border: #334155;
-  --rubro-popover-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
+  --rubro-bg: rgba(0, 172, 233, 0.16);
+  --rubro-text: #38bdf8;
+  --rubro-popover-bg: #16223d;
+  --rubro-popover-border: #26385e;
+  --rubro-popover-shadow: 0 10px 15px -3px rgba(0,0,0,0.45);
 
   /* Row zebra */
-  --row-zebra: rgba(30, 41, 59, 0.3);
-  --row-hover: #1e293b;
+  --row-zebra: rgba(23, 35, 63, 0.4);
+  --row-hover: #182544;
 }
 
 * {
@@ -306,13 +319,17 @@ button:disabled, .btn:disabled {
   display: flex;
   align-items: center;
   border-bottom: 1px solid hsl(var(--border));
+  background-image: var(--brand-top-stripe);
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+  background-position: top;
   gap: 6px;
 }
 
 .logo-sj {
   font-weight: 800;
   font-size: 24px;
-  color: #3b82f6;
+  color: #00ace9;
   font-style: italic;
 }
 
@@ -348,15 +365,37 @@ button:disabled, .btn:disabled {
   text-align: left;
 }
 
+.sidebar-item svg {
+  color: #0284c7;
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+.dark-theme .sidebar-item svg {
+  color: #38bdf8;
+  opacity: 0.8;
+}
+
 .sidebar-item:hover {
   background-color: var(--sidebar-item-hover);
   color: var(--text-main-hex);
 }
 
+.sidebar-item:hover svg {
+  opacity: 1;
+  transform: translateX(1px);
+}
+
 .sidebar-item.active {
-  background-color: var(--sidebar-item-active-bg);
+  background: var(--sidebar-item-active-bg);
   color: var(--sidebar-item-active-color);
+  box-shadow: inset 3px 0 0 #00ace9;
   font-weight: 600;
+}
+
+.sidebar-item.active svg {
+  color: var(--sidebar-item-active-color);
+  opacity: 1;
 }
 
 .main-content {
@@ -370,6 +409,10 @@ button:disabled, .btn:disabled {
 .top-header {
   height: 70px;
   background-color: var(--header-bg);
+  background-image: var(--brand-top-stripe);
+  background-size: 100% 3px;
+  background-repeat: no-repeat;
+  background-position: top;
   border-bottom: 1px solid hsl(var(--border));
   display: flex;
   align-items: center;
@@ -397,8 +440,9 @@ button:disabled, .btn:disabled {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #93c5fd;
-  color: #1e3a8a;
+  background: linear-gradient(135deg, #041a72 0%, #00ace9 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 172, 233, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -60,10 +60,11 @@ public class AuthController {
             // SEC-13: Limpiar intentos fallidos en login exitoso
             loginAttempts.remove(clientIp);
             
-            // SEC-10/SEC-11: Cookie segura con SameSite=Lax
+            // SEC-10/SEC-11: Cookie segura con SameSite=Lax (activa flag Secure automáticamente en HTTPS)
+            boolean isSecure = "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto")) || httpRequest.isSecure();
             ResponseCookie cookie = ResponseCookie.from("token", token)
                     .httpOnly(true)
-                    .secure(false) // Cambiar a true en producción con HTTPS
+                    .secure(isSecure)
                     .sameSite("Lax")
                     .path("/")
                     .maxAge(86400) // 1 día
@@ -101,11 +102,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletResponse response) {
+    public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletRequest httpRequest, jakarta.servlet.http.HttpServletResponse response) {
         // SEC-10/SEC-11: Cookie de logout con SameSite=Lax
+        boolean isSecure = "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto")) || httpRequest.isSecure();
         ResponseCookie cookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(isSecure)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)
