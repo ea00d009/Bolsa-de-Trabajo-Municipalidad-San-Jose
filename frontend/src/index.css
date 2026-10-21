@@ -710,6 +710,19 @@ input::placeholder {
 }
 
 /* CV Sheet viewed on screen (adapts to dark mode) */
+.cv-logo-light {
+  display: block;
+}
+.cv-logo-dark {
+  display: none;
+}
+.dark-theme .cv-print-layout:not(.force-light) .cv-logo-light {
+  display: none;
+}
+.dark-theme .cv-print-layout:not(.force-light) .cv-logo-dark {
+  display: block;
+}
+
 .cv-print-layout {
   background-color: var(--card-bg-hex) !important;
   color: var(--text-main-hex) !important;
@@ -865,6 +878,12 @@ input::placeholder {
     min-height: auto !important;
     background-color: white !important;
     color: black !important;
+  }
+  .cv-print-layout .cv-logo-light {
+    display: block !important;
+  }
+  .cv-print-layout .cv-logo-dark {
+    display: none !important;
   }
   .cv-print-layout .cv-header h1 {
     color: #0f172a !important;

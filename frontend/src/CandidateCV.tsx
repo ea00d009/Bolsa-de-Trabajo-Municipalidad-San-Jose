@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
+import logoSjtp from './assets/sjtp_logo.png';
+import logoSjtpDark from './assets/sjtp_logo_dark.png';
 
 interface UserProfile {
   id: number;
@@ -894,9 +896,10 @@ export default function CandidateCV({ token, candidateId, onBack, onPrev, onNext
       width: '100%',
       boxSizing: 'border-box'
     }}>
-      {/* SJ Ciudad Logo Top Right */}
-      <div style={{ position: 'absolute', top: '40px', right: '40px', fontSize: '18px', fontWeight: 800 }}>
-        <span style={{ color: '#00b4d8' }}>SJ</span> Ciudad
+      {/* SJTP Logo Top Right */}
+      <div style={{ position: 'absolute', top: '38px', right: '40px' }}>
+        <img className="cv-logo-light" src={logoSjtp} alt="SJTP Trabajo y Producción" style={{ height: '28px', objectFit: 'contain' }} />
+        <img className="cv-logo-dark" src={logoSjtpDark} alt="SJTP Trabajo y Producción" style={{ height: '28px', objectFit: 'contain' }} />
       </div>
 
       <table className="cv-print-table">
