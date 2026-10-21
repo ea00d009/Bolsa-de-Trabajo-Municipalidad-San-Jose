@@ -380,7 +380,7 @@ export default function UserManual() {
             <div style={styles.stepItem}>
               <span style={{ ...styles.stepNumber, backgroundColor: '#7c3aed' }}>2</span>
               <div>
-                <strong>Cambiar Contraseñas:</strong> En caso de olvido o renovación de seguridad, el administrador puede actualizar la clave de acceso de cualquier usuario.
+                <strong>Cambiar Contraseñas (Individual o Masivo por Rol):</strong> Desde el botón de cada fila o desde el botón superior <code>Cambiar Contraseñas (Masivo / Rol)</code>, el administrador puede actualizar la clave de acceso de un usuario específico (entrevistador o administrador), o bien aplicar una nueva contraseña en forma masiva a <strong>todos los Entrevistadores</strong>, a <strong>todos los Administradores</strong>, o a <strong>todo el Personal</strong> simultáneamente.
               </div>
             </div>
             <div style={styles.stepItem}>

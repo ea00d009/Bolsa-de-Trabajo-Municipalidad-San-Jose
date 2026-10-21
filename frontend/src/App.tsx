@@ -273,6 +273,8 @@ export default function App() {
   // Change password form states
   const [changePasswordField, setChangePasswordField] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordTargetMode, setPasswordTargetMode] = useState<'INDIVIDUAL' | 'ENTREVISTADORES' | 'ADMINISTRADORES' | 'TODOS'>('INDIVIDUAL');
+  const [showPasswordPreview, setShowPasswordPreview] = useState(false);
 
   const fetchUsers = () => {
     setLoadingUsers(true);
@@ -353,20 +355,29 @@ export default function App() {
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUserForPassword || !changePasswordField.trim()) {
+    if (!changePasswordField.trim()) {
       window.showToast('Por favor ingresa la nueva contraseña.', 'error');
       return;
     }
+    if (passwordTargetMode === 'INDIVIDUAL' && !selectedUserForPassword) {
+      window.showToast('Selecciona un usuario válido.', 'error');
+      return;
+    }
+
     setChangingPassword(true);
-    fetch(`/api/users/${selectedUserForPassword.id}/password`, {
+    const isBulk = passwordTargetMode !== 'INDIVIDUAL';
+    const endpoint = isBulk ? '/api/users/bulk-password' : `/api/users/${selectedUserForPassword.id}/password`;
+    const payload = isBulk
+      ? { password: changePasswordField.trim(), scope: passwordTargetMode }
+      : { password: changePasswordField.trim() };
+
+    fetch(endpoint, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        password: changePasswordField.trim()
-      })
+      body: JSON.stringify(payload)
     })
     .then(async res => {
       if (!res.ok) {
@@ -375,11 +386,13 @@ export default function App() {
       }
       return res.json();
     })
-    .then(() => {
-      window.showToast('Contraseña actualizada con éxito.', 'success');
+    .then((data) => {
+      window.showToast(data?.message || 'Contraseña actualizada con éxito.', 'success');
       setShowChangePasswordModal(false);
       setSelectedUserForPassword(null);
       setChangePasswordField('');
+      setPasswordTargetMode('INDIVIDUAL');
+      setShowPasswordPreview(false);
     })
     .catch(err => {
       window.showToast(err.message || 'Ocurrió un error.', 'error');
@@ -2380,33 +2393,64 @@ export default function App() {
 
           {activeTab === 'personal' && (
             <div className="fade-in" style={{ maxWidth: '100%', width: '100%', margin: '0 auto', padding: '0 20px' }}>
-              <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                   <h1 style={{ fontSize: '29px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Gestión de Personal</h1>
-                  <p style={{ color: 'var(--text-muted-hex)', marginTop: '4px' }}>Crea entrevistadores, gestiona cuentas y administra accesos del sistema.</p>
+                  <p style={{ color: 'var(--text-muted-hex)', marginTop: '4px' }}>Crea entrevistadores, gestiona cuentas, cambia contraseñas individuales o masivas y administra accesos del sistema.</p>
                 </div>
-                <button
-                  onClick={() => setShowCreateUserModal(true)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 20px',
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '10px',
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'var(--transition)'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
-                >
-                  <Plus size={16} />
-                  Nuevo Entrevistador
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      setSelectedUserForPassword(users[0] || null);
+                      setPasswordTargetMode('ENTREVISTADORES');
+                      setChangePasswordField('');
+                      setShowPasswordPreview(false);
+                      setShowChangePasswordModal(true);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 18px',
+                      backgroundColor: 'var(--card-bg-hex)',
+                      color: 'var(--text-main-hex)',
+                      border: '1px solid var(--border-hex)',
+                      borderRadius: '10px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'var(--transition)'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-alt-hex)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--card-bg-hex)'}
+                  >
+                    <Key size={16} style={{ color: '#8b5cf6' }} />
+                    Cambiar Contraseñas (Masivo / Rol)
+                  </button>
+
+                  <button
+                    onClick={() => setShowCreateUserModal(true)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 20px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'var(--transition)'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+                  >
+                    <Plus size={16} />
+                    Nuevo Entrevistador
+                  </button>
+                </div>
               </div>
 
               {usersError && (
@@ -2512,6 +2556,9 @@ export default function App() {
                                 <button
                                   onClick={() => {
                                     setSelectedUserForPassword(userItem);
+                                    setPasswordTargetMode('INDIVIDUAL');
+                                    setChangePasswordField('');
+                                    setShowPasswordPreview(false);
                                     setShowChangePasswordModal(true);
                                   }}
                                   style={{
@@ -2752,8 +2799,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Sleek Change Password Modal */}
-      {showChangePasswordModal && selectedUserForPassword && (
+      {/* Sleek Change Password Modal (Individual or Bulk by Role) */}
+      {showChangePasswordModal && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -2773,11 +2820,11 @@ export default function App() {
             border: '1px solid var(--border-hex)',
             boxShadow: 'var(--shadow-lg)',
             width: '100%',
-            maxWidth: '400px',
+            maxWidth: '460px',
             padding: '32px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '24px',
+            gap: '20px',
             position: 'relative'
           }}>
             <button
@@ -2785,6 +2832,8 @@ export default function App() {
                 setShowChangePasswordModal(false);
                 setSelectedUserForPassword(null);
                 setChangePasswordField('');
+                setPasswordTargetMode('INDIVIDUAL');
+                setShowPasswordPreview(false);
               }}
               style={{
                 position: 'absolute',
@@ -2800,19 +2849,106 @@ export default function App() {
             </button>
 
             <div>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Cambiar Contraseña</h3>
+              <h3 style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text-main-hex)' }}>
+                Cambiar Contraseña de Personal
+              </h3>
               <p style={{ fontSize: '13px', color: 'var(--text-muted-hex)', marginTop: '4px' }}>
-                Actualiza la contraseña del usuario <strong style={{ color: 'var(--text-main-hex)' }}>{selectedUserForPassword.nombreCompleto}</strong>.
+                Puedes actualizar la contraseña de un usuario puntual o aplicarla masivamente a todos los entrevistadores y/o administradores.
               </p>
             </div>
 
             <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Selector de Destinatario / Alcance */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main-hex)' }}>Nueva Contraseña</label>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main-hex)' }}>
+                  ¿A quién deseas cambiar la contraseña?
+                </label>
+                <select
+                  value={passwordTargetMode}
+                  onChange={(e) => {
+                    const val = e.target.value as 'INDIVIDUAL' | 'ENTREVISTADORES' | 'ADMINISTRADORES' | 'TODOS';
+                    setPasswordTargetMode(val);
+                    if (val === 'INDIVIDUAL' && !selectedUserForPassword && users.length > 0) {
+                      setSelectedUserForPassword(users[0]);
+                    }
+                  }}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-hex)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    backgroundColor: 'var(--card-bg-hex)',
+                    color: 'var(--text-main-hex)'
+                  }}
+                >
+                  <option value="INDIVIDUAL">Usuario individual seleccionado</option>
+                  <option value="ENTREVISTADORES">
+                    Todos los Entrevistadores ({users.filter(u => !u.role?.toLowerCase().includes('superadmin')).length} cuentas)
+                  </option>
+                  <option value="ADMINISTRADORES">
+                    Todos los Administradores / SuperAdmin ({users.filter(u => u.role?.toLowerCase().includes('superadmin')).length} cuentas)
+                  </option>
+                  <option value="TODOS">
+                    Todo el Personal — Entrevistadores y Administradores ({users.length} cuentas)
+                  </option>
+                </select>
+              </div>
+
+              {/* Si es individual, permitir elegir cualquier usuario (entrevistador o admin) */}
+              {passwordTargetMode === 'INDIVIDUAL' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main-hex)' }}>
+                    Usuario a modificar
+                  </label>
+                  <select
+                    value={selectedUserForPassword?.id || ''}
+                    onChange={(e) => {
+                      const found = users.find(u => u.id === Number(e.target.value));
+                      if (found) setSelectedUserForPassword(found);
+                    }}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-hex)',
+                      fontSize: '14px',
+                      backgroundColor: 'var(--card-bg-hex)',
+                      color: 'var(--text-main-hex)'
+                    }}
+                  >
+                    {users.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.nombreCompleto || u.username} ({u.username}) — {u.role?.replace('ROLE_', '')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Campo de Nueva Contraseña */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main-hex)' }}>Nueva Contraseña</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordPreview(prev => !prev)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#3b82f6',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
+                  >
+                    {showPasswordPreview ? 'Ocultar' : 'Mostrar texto'}
+                  </button>
+                </div>
                 <input
-                  type="password"
+                  type={showPasswordPreview ? 'text' : 'password'}
                   required
-                  placeholder="Ingresa la nueva contraseña"
+                  placeholder="Ej. SanJose2026!"
                   value={changePasswordField}
                   onChange={(e) => setChangePasswordField(e.target.value)}
                   style={{
@@ -2824,6 +2960,9 @@ export default function App() {
                     color: 'var(--text-main-hex)'
                   }}
                 />
+                <span style={{ fontSize: '12px', color: 'var(--text-muted-hex)', lineHeight: 1.4 }}>
+                  Requisitos: mínimo 8 caracteres, al menos 1 mayúscula, 1 número y 1 símbolo especial (ej. <code>!@#$%</code>).
+                </span>
               </div>
 
               <button
@@ -2832,13 +2971,13 @@ export default function App() {
                 style={{
                   padding: '12px',
                   borderRadius: '10px',
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: passwordTargetMode === 'INDIVIDUAL' ? '#3b82f6' : '#8b5cf6',
                   color: 'white',
                   border: 'none',
                   fontSize: '14px',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  marginTop: '12px',
+                  marginTop: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -2851,7 +2990,13 @@ export default function App() {
                     Actualizando...
                   </>
                 ) : (
-                  'Confirmar Cambio'
+                  passwordTargetMode === 'INDIVIDUAL'
+                    ? 'Confirmar Cambio Individual'
+                    : passwordTargetMode === 'ENTREVISTADORES'
+                    ? 'Aplicar a Todos los Entrevistadores'
+                    : passwordTargetMode === 'ADMINISTRADORES'
+                    ? 'Aplicar a Todos los Administradores'
+                    : 'Aplicar a Todo el Personal'
                 )}
               </button>
             </form>

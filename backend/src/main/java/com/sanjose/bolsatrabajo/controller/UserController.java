@@ -112,6 +112,47 @@ public class UserController {
         return ResponseEntity.ok().body(Map.of("message", "Contraseña actualizada con éxito."));
     }
 
+    @PutMapping("/bulk-password")
+    public ResponseEntity<?> changeBulkPassword(@RequestBody Map<String, String> request) {
+        String newPassword = request.get("password");
+        String scope = request.getOrDefault("scope", "TODOS").trim().toUpperCase();
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("La nueva contraseña no puede estar vacía.");
+        }
+        String passwordError = validatePasswordComplexity(newPassword.trim());
+        if (passwordError != null) {
+            return ResponseEntity.badRequest().body(passwordError);
+        }
+
+        List<User> allUsers = userRepository.findByDeletedAtIsNull();
+        String encoded = passwordEncoder.encode(newPassword.trim());
+        int updatedCount = 0;
+
+        for (User u : allUsers) {
+            String roleLower = u.getRole() != null ? u.getRole().toLowerCase() : "";
+            boolean isAdmin = roleLower.contains("superadmin");
+
+            boolean matches = switch (scope) {
+                case "ENTREVISTADORES" -> !isAdmin;
+                case "ADMINISTRADORES" -> isAdmin;
+                case "TODOS" -> true;
+                default -> false;
+            };
+
+            if (matches) {
+                u.setPassword(encoded);
+                userRepository.save(u);
+                updatedCount++;
+            }
+        }
+
+        return ResponseEntity.ok().body(Map.of(
+                "message", "Se actualizó la contraseña de " + updatedCount + " cuenta(s) correctamente.",
+                "updatedCount", updatedCount
+        ));
+    }
+
     @PutMapping("/{id}/status")
     public ResponseEntity<?> toggleStatus(@PathVariable Integer id, @RequestBody Map<String, Boolean> request) {
         Boolean active = request.get("activo");
