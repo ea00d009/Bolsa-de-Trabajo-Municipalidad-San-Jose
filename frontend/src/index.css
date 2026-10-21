@@ -143,7 +143,7 @@ img, svg, button, aside, nav, header {
 }
 
 html {
-  scrollbar-gutter: stable;
+  background-color: var(--bg-app-hex);
 }
 
 body {

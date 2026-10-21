@@ -56,7 +56,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100vh',
+      width: '100%',
+      overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
