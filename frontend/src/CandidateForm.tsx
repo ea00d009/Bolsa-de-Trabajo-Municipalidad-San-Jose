@@ -502,12 +502,14 @@ export default function CandidateForm({ token, candidateId, onBack, onSaveSucces
   }
 
   return (
-    <form onSubmit={handleSubmit} className="fade-in" style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+    <form onSubmit={handleSubmit} className="fade-in responsive-page-pad" style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
       {/* Top Header Card */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
         marginBottom: '32px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -572,7 +574,7 @@ export default function CandidateForm({ token, candidateId, onBack, onSaveSucces
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
           {/* Foto Preview & Upload */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '8px', padding: '16px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '12px', border: '1px solid var(--border-hex)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '20px', marginBottom: '8px', padding: '16px', backgroundColor: 'var(--bg-alt-hex)', borderRadius: '12px', border: '1px solid var(--border-hex)' }}>
             <div
               onClick={() => fileInputRef.current?.click()}
               style={{
@@ -874,7 +876,7 @@ export default function CandidateForm({ token, candidateId, onBack, onSaveSucces
           {formData.cudDiscapacidad && (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
               gap: '20px',
               marginTop: '16px',
               paddingTop: '16px',
@@ -1083,7 +1085,7 @@ export default function CandidateForm({ token, candidateId, onBack, onSaveSucces
                   <Trash2 size={16} />
                 </button>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginRight: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginRight: '32px' }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label>Empresa</label>
                     <input
@@ -1247,7 +1249,7 @@ export default function CandidateForm({ token, candidateId, onBack, onSaveSucces
                   <Trash2 size={16} />
                 </button>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginRight: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginRight: '32px' }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label>Nivel Alcanzado</label>
                     <select

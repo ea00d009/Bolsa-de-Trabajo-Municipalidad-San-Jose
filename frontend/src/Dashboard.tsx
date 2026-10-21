@@ -344,13 +344,14 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
 
   return (
     <>
-      <div className="fade-in" style={{ padding: '40px', maxWidth: '100%', margin: '0 auto', width: '100%' }}>
+      <div className="fade-in responsive-page-pad" style={{ maxWidth: '100%', margin: '0 auto', width: '100%' }}>
       {/* Search and Action Bar (Mockup Style) */}
-      <div style={{
+      <div className="dashboard-search-bar" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '28px',
+        flexWrap: 'wrap',
+        gap: '20px',
         marginBottom: '32px',
         backgroundColor: 'var(--card-bg-hex)',
         padding: '20px 32px',
@@ -358,8 +359,8 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
         border: '2px solid hsl(var(--primary))',
         boxShadow: '0 12px 30px -10px hsl(var(--primary) / 0.22), 0 4px 12px -5px hsl(var(--primary) / 0.15), var(--shadow-lg)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1 }}>
-          <div style={{ position: 'relative', flex: 1, maxWidth: '520px' }}>
+        <div className="dashboard-search-controls" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '20px', flex: '1 1 600px' }}>
+          <div style={{ position: 'relative', flex: '1 1 220px', maxWidth: '520px' }}>
             <Search size={22} style={{
               position: 'absolute',
               left: '16px',
@@ -388,7 +389,7 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
             />
           </div>
 
-          <div style={{ width: '1.5px', height: '36px', backgroundColor: 'var(--border-hex)' }}></div>
+          <div className="search-bar-divider" style={{ width: '1.5px', height: '36px', backgroundColor: 'var(--border-hex)' }}></div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <select
@@ -451,7 +452,7 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
             </select>
           </div>
 
-          <div style={{ width: '1.5px', height: '36px', backgroundColor: 'var(--border-hex)' }}></div>
+          <div className="search-bar-divider" style={{ width: '1.5px', height: '36px', backgroundColor: 'var(--border-hex)' }}></div>
 
           <button
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}

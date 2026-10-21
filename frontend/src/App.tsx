@@ -244,7 +244,7 @@ export default function App() {
     fetchCatalogs();
   }, [showConfigModal, token]);
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.innerWidth <= 1024);
 
   useEffect(() => {
     const handleResize = () => {
@@ -1020,9 +1020,9 @@ export default function App() {
           </div>
 
           {/* Split Panel Layout */}
-          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          <div className="catalogos-modal-split" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
             {/* Left Column (Vertical Tabs - 1/3) */}
-            <div style={{
+            <div className="catalogos-modal-tabs" style={{
               width: '240px',
               borderRight: '1px solid var(--border-hex)',
               backgroundColor: 'var(--bg-app-hex)',
@@ -1485,8 +1485,8 @@ export default function App() {
                     style={{ maxHeight: '34px', maxWidth: '190px', objectFit: 'contain', userSelect: 'none' }} 
                   />
                 </button>
-                <span style={{ color: 'var(--border-hex)', fontSize: '16px', userSelect: 'none' }}>|</span>
-                <span style={{ 
+                <span className="header-date-group" style={{ color: 'var(--border-hex)', fontSize: '16px', userSelect: 'none' }}>|</span>
+                <span className="header-date-group" style={{ 
                   fontSize: '13px', 
                   color: 'var(--text-muted-hex)', 
                   fontWeight: 500,
@@ -1602,7 +1602,7 @@ export default function App() {
         </header>
 
         {/* Dynamic View Dispatcher */}
-        <main style={{ flex: 1, padding: activeTab === 'postulantes' ? '0' : '40px', display: 'flex', flexDirection: 'column' }}>
+        <main className={activeTab === 'postulantes' ? '' : 'responsive-page-pad'} style={{ flex: 1, padding: activeTab === 'postulantes' ? '0' : undefined, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {activeTab === 'postulantes' && (
             <>
               {view === 'dashboard' && (
@@ -1660,12 +1660,12 @@ export default function App() {
 
           {activeTab === 'informes' && (
             <div className="fade-in print-reports-layout" style={{ maxWidth: '100%', width: '100%', margin: '0 auto' }}>
-              <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="no-print">
+              <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }} className="no-print">
                 <div>
                   <h1 style={{ fontSize: '29px', fontWeight: 700, color: 'var(--text-main-hex)' }}>Panel de Control de Estadísticas</h1>
                   <p style={{ color: 'var(--text-muted-hex)', marginTop: '4px' }}>Métricas analíticas en tiempo real y trazabilidad del personal.</p>
                 </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button
                     onClick={exportToCSV}
                     disabled={!stats || loadingStats}
@@ -1820,7 +1820,7 @@ export default function App() {
               </div>
 
               {!loadingStats && stats && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', gap: '32px' }}>
                   
                   {/* Left Column */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -2198,7 +2198,7 @@ export default function App() {
 
                     {/* Grilla detallada de 2 columnas para Empresas */}
                     {!loadingStats && stats && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '32px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', gap: '32px' }}>
                         {/* Columna Izquierda (Empresas) */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                           {/* 1. Desempeño de Entrevistadores (Empresas) */}

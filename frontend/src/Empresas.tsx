@@ -1158,7 +1158,7 @@ export default function Empresas({ token, userRole }: EmpresasProps) {
           )}
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '20px' }}>
           {filtered.map(empresa => (
             <EmpresaCard
               key={empresa.id}

@@ -1154,17 +1154,19 @@ export default function CandidateCV({ token, candidateId, onBack, onPrev, onNext
   // Normal view mode
   if (!isEditing) {
     return (
-      <div className="fade-in" style={{ padding: '40px', width: '100%' }}>
+      <div className="fade-in responsive-page-pad" style={{ width: '100%' }}>
         {/* Top Action Bar (no-print) */}
         <div className="no-print" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
           marginBottom: '32px',
           maxWidth: '1200px',
           margin: '0 auto 32px auto'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
             <button
               onClick={onBack}
               className="btn-secondary"
@@ -1229,7 +1231,7 @@ export default function CandidateCV({ token, candidateId, onBack, onPrev, onNext
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
             <button
               onClick={() => setIsEditing(true)}
               className="btn-secondary"
@@ -1284,7 +1286,7 @@ export default function CandidateCV({ token, candidateId, onBack, onPrev, onNext
         </div>
 
         {/* Two-column layout: CV Sheet + Admin Panel */}
-        <div style={{
+        <div className="cv-view-split" style={{
           display: 'flex',
           gap: '24px',
           maxWidth: '1200px',
@@ -1823,7 +1825,7 @@ export default function CandidateCV({ token, candidateId, onBack, onPrev, onNext
       </div>
 
       {/* Editor Body (Split pane) */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="cv-editor-split" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left Pane (Scrollable editor sidebar) */}
         <div className="cv-editor-left-pane" style={{
           width: '460px',

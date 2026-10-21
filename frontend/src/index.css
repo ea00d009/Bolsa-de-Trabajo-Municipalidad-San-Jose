@@ -1033,3 +1033,114 @@ body.hide-sidebar-edit .app-container {
   transform: translateY(-0.5px);
 }
 
+/* ==========================================================================
+   Responsividad Integral (Desktop, Notebooks, Tablets y Móviles)
+   ========================================================================== */
+.responsive-page-pad {
+  padding: 40px;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-search-bar {
+    flex-wrap: wrap !important;
+    padding: 18px 22px !important;
+    gap: 16px !important;
+  }
+  .dashboard-search-controls {
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+  }
+  .search-bar-divider {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px), (hover: none) {
+  .row-actions {
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .responsive-page-pad {
+    padding: 24px 20px !important;
+  }
+  .top-header {
+    padding: 0 20px !important;
+  }
+  .cv-view-split {
+    flex-direction: column !important;
+  }
+  .cv-view-split > div {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .cv-admin-panel {
+    width: 100% !important;
+    position: static !important;
+  }
+  .cv-editor-split {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+  .cv-editor-left-pane {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-hex) !important;
+    overflow-y: visible !important;
+  }
+  .manual-layout {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  .manual-sidebar {
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  .manual-sidebar .sidebar-item {
+    width: auto !important;
+    flex: 1 1 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-date-group {
+    display: none !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .responsive-page-pad {
+    padding: 16px 12px !important;
+  }
+  .top-header {
+    padding: 0 12px !important;
+  }
+  .user-name {
+    display: none !important;
+  }
+  .dashboard-search-bar > button {
+    width: 100% !important;
+  }
+  .manual-content {
+    padding: 24px 16px !important;
+  }
+  .catalogos-modal-split {
+    flex-direction: column !important;
+  }
+  .catalogos-modal-tabs {
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-hex) !important;
+    padding: 12px !important;
+  }
+  .catalogos-modal-tabs > button {
+    width: auto !important;
+    flex: 1 1 130px;
+  }
+}
+
+

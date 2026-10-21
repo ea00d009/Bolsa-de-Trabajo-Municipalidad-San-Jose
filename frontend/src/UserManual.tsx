@@ -432,9 +432,9 @@ export default function UserManual() {
         </div>
       </div>
 
-      <div style={styles.layout}>
+      <div className="manual-layout" style={styles.layout}>
         {/* Navigation Sidebar */}
-        <div style={styles.sidebar}>
+        <div className="manual-sidebar" style={styles.sidebar}>
           {sections.map(section => (
             <button
               key={section.id}
@@ -455,7 +455,7 @@ export default function UserManual() {
         </div>
 
         {/* Content Viewer */}
-        <div style={styles.contentArea}>
+        <div className="manual-content" style={styles.contentArea}>
           {sections.find(s => s.id === activeSection)?.content}
         </div>
       </div>
