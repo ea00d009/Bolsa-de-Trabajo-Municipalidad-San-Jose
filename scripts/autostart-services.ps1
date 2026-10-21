@@ -14,6 +14,7 @@ if (-not (Test-Path $LogsDir)) {
 # Evitar que la PC Servidor entre en suspensión automática mientras está enchufada
 powercfg /change standby-timeout-ac 0 | Out-Null
 powercfg /change hibernate-timeout-ac 0 | Out-Null
+schtasks.exe /Change /TN "BolsaTrabajoWatchdog" /ENABLE 2>$null | Out-Null
 
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-21.0.12.101-hotspot"
 $NodeDir       = "$env:LOCALAPPDATA\Programs\nodejs"
