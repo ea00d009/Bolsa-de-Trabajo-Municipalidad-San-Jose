@@ -56,6 +56,9 @@ public class SecurityConfig {
                 
                 .requestMatchers(HttpMethod.GET, "/api/rubros/**").hasAnyRole("SuperAdmin", "Entrevistador")
                 .requestMatchers("/api/rubros/**").hasRole("SuperAdmin")
+
+                .requestMatchers(HttpMethod.GET, "/api/catalogos-config/**").hasAnyRole("SuperAdmin", "Entrevistador")
+                .requestMatchers("/api/catalogos-config/**").hasRole("SuperAdmin")
                 
                 // Postulantes (Ciudadanos) y Entrevistas: Lectura/Escritura a SuperAdmin/Entrevistador. Borrado a SuperAdmin.
                 .requestMatchers(HttpMethod.DELETE, "/api/ciudadanos/**").hasRole("SuperAdmin")
@@ -76,7 +79,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        java.util.List<String> patterns = new java.util.ArrayList<>(Arrays.asList(
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "http://192.168.*:*",
+            "http://10.*:*",
+            "http://172.*:*",
+            "http://*.local:*",
+            "http://DESKTOP-OB5FKHB:*",
+            "http://desktop-ob5fkhb:*"
+        ));
+        for (String origin : allowedOrigins.split(",")) {
+            String trimmed = origin.trim();
+            if (!trimmed.isEmpty() && !patterns.contains(trimmed)) {
+                patterns.add(trimmed);
+            }
+        }
+        configuration.setAllowedOriginPatterns(patterns);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control", "Cookie"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));

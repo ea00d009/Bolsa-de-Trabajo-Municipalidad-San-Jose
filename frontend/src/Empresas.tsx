@@ -198,19 +198,41 @@ export default function Empresas({ token, userRole }: EmpresasProps) {
   const isSuperAdmin = userRole === 'SuperAdmin';
   const authHeaders = useMemo(() => ({ 'Authorization': `Bearer ${token}` }), [token]);
 
-  const fetchEmpresas = async () => {
-    setLoading(true);
+  const fetchEmpresas = async (silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await fetch('/api/empresas', { headers: authHeaders });
       if (!res.ok) throw new Error(await readError(res, 'No se pudieron cargar las empresas.'));
       setEmpresas(await res.json());
     } catch (err: unknown) {
-      setError((err as Error).message || 'No se pudieron cargar las empresas.');
+      if (!silent) {
+        setError((err as Error).message || 'No se pudieron cargar las empresas.');
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   };
+
+  // Sincronización automática cada 30s y al recuperar foco en modo lista
+  useEffect(() => {
+    if (!token || viewMode !== 'list') return;
+    const interval = setInterval(() => {
+      fetchEmpresas(true);
+    }, 30000);
+    const onFocus = () => {
+      fetchEmpresas(true);
+    };
+    window.addEventListener('focus', onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [token, viewMode]);
 
   useEffect(() => {
     if (!token) return;

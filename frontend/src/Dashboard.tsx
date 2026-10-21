@@ -104,9 +104,11 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
     }
   };
 
-  const fetchCandidates = async () => {
+  const fetchCandidates = async (silent = false) => {
     const t0 = performance.now();
-    setLoading(true);
+    if (!silent) {
+      setLoading(true);
+    }
     setError('');
     try {
       const params = new URLSearchParams();
@@ -156,10 +158,14 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
       setTotalElements(data.totalElements || 0);
       setFetchTimeMs(Math.round(performance.now() - t0));
     } catch (err: any) {
-      setError(err.message || 'Error de conexión.');
-      setFetchTimeMs(null);
+      if (!silent) {
+        setError(err.message || 'Error de conexión.');
+        setFetchTimeMs(null);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   };
 
@@ -170,6 +176,23 @@ export default function Dashboard({ token, userRole, rubrosChangedCount, onNewCa
 
   useEffect(() => {
     fetchCandidates();
+  }, [search, selectedRubroId, selectedEstadoLaboral, page, filterAgeRange, filterHasCud, filterEducationLevel, filterBarrioId]);
+
+  // Sincronización automática en red LAN cada 30s y al recuperar foco (para 2-3 entrevistadores en simultáneo)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchCandidates(true);
+    }, 30000);
+    const onFocus = () => {
+      fetchCandidates(true);
+      fetchRubros();
+      fetchBarrios();
+    };
+    window.addEventListener('focus', onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
   }, [search, selectedRubroId, selectedEstadoLaboral, page, filterAgeRange, filterHasCud, filterEducationLevel, filterBarrioId]);
 
   useEffect(() => {

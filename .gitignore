@@ -49,6 +49,8 @@ jspm_packages/
 logs/
 backend/application-local.properties
 backend/application-prod.properties
+backend/catalogos-config.json
+catalogos-config.json
 
 # Database dumps, spreadsheets and local backups (Sensitive PII data)
 *.csv

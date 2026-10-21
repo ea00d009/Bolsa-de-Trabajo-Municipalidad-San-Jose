@@ -158,8 +158,24 @@ export default function App() {
   const [editingCatalogName, setEditingCatalogName] = useState('');
   const [savingCatalog, setSavingCatalog] = useState(false);
 
-  useEffect(() => {
-    // Load Niveles Educativos
+  const syncCatalogosConfigFromServer = async () => {
+    try {
+      const res = await fetch('/api/catalogos-config');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.nivelesEducativos)) {
+          setNivelesEducativos(data.nivelesEducativos);
+          localStorage.setItem('oficina_empleo_niveles_educativos', JSON.stringify(data.nivelesEducativos));
+        }
+        if (Array.isArray(data.estadosLaborales)) {
+          setEstadosLaborales(data.estadosLaborales);
+          localStorage.setItem('oficina_empleo_estados_laborales', JSON.stringify(data.estadosLaborales));
+        }
+        return;
+      }
+    } catch {
+      // Fallback a localStorage si aún no hay sesión o red
+    }
     const savedNiveles = localStorage.getItem('oficina_empleo_niveles_educativos');
     if (savedNiveles) {
       setNivelesEducativos(JSON.parse(savedNiveles));
@@ -169,7 +185,6 @@ export default function App() {
       localStorage.setItem('oficina_empleo_niveles_educativos', JSON.stringify(defaults));
     }
 
-    // Load Estados Laborales
     const savedEstados = localStorage.getItem('oficina_empleo_estados_laborales');
     if (savedEstados) {
       setEstadosLaborales(JSON.parse(savedEstados));
@@ -178,7 +193,23 @@ export default function App() {
       setEstadosLaborales(defaults);
       localStorage.setItem('oficina_empleo_estados_laborales', JSON.stringify(defaults));
     }
-  }, []);
+  };
+
+  const saveCatalogosConfigToServer = async (niveles: string[], estados: string[]) => {
+    try {
+      await fetch('/api/catalogos-config', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nivelesEducativos: niveles, estadosLaborales: estados })
+      });
+    } catch (err) {
+      console.error('Error sincronizando catálogos en el servidor:', err);
+    }
+  };
+
+  useEffect(() => {
+    syncCatalogosConfigFromServer();
+  }, [token]);
 
   // Fetch database catalogs when settings modal opens
   useEffect(() => {
@@ -186,6 +217,7 @@ export default function App() {
 
     const fetchCatalogs = async () => {
       try {
+        await syncCatalogosConfigFromServer();
         // Fetch rubros
         const resRubros = await fetch('/api/rubros', {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -757,12 +789,14 @@ export default function App() {
         const updated = [...nivelesEducativos, newCatalogName.trim()];
         setNivelesEducativos(updated);
         localStorage.setItem('oficina_empleo_niveles_educativos', JSON.stringify(updated));
+        await saveCatalogosConfigToServer(updated, estadosLaborales);
         setNewCatalogName('');
         window.showToast('Nivel educativo agregado con éxito.', 'success');
       } else if (activeConfigTab === 'estados') {
         const updated = [...estadosLaborales, newCatalogName.trim()];
         setEstadosLaborales(updated);
         localStorage.setItem('oficina_empleo_estados_laborales', JSON.stringify(updated));
+        await saveCatalogosConfigToServer(nivelesEducativos, updated);
         setNewCatalogName('');
         window.showToast('Estado laboral agregado con éxito.', 'success');
       }
@@ -814,6 +848,7 @@ export default function App() {
         updated[idx] = editingCatalogName.trim();
         setNivelesEducativos(updated);
         localStorage.setItem('oficina_empleo_niveles_educativos', JSON.stringify(updated));
+        await saveCatalogosConfigToServer(updated, estadosLaborales);
         setEditingCatalogIdx(null);
         setEditingCatalogName('');
         window.showToast('Nivel educativo actualizado.', 'success');
@@ -822,6 +857,7 @@ export default function App() {
         updated[idx] = editingCatalogName.trim();
         setEstadosLaborales(updated);
         localStorage.setItem('oficina_empleo_estados_laborales', JSON.stringify(updated));
+        await saveCatalogosConfigToServer(nivelesEducativos, updated);
         setEditingCatalogIdx(null);
         setEditingCatalogName('');
         window.showToast('Estado laboral actualizado.', 'success');
@@ -877,11 +913,13 @@ export default function App() {
             const updated = nivelesEducativos.filter((_, i) => i !== idx);
             setNivelesEducativos(updated);
             localStorage.setItem('oficina_empleo_niveles_educativos', JSON.stringify(updated));
+            await saveCatalogosConfigToServer(updated, estadosLaborales);
             window.showToast('Nivel educativo eliminado.', 'success');
           } else if (activeConfigTab === 'estados' && idx !== null) {
             const updated = estadosLaborales.filter((_, i) => i !== idx);
             setEstadosLaborales(updated);
             localStorage.setItem('oficina_empleo_estados_laborales', JSON.stringify(updated));
+            await saveCatalogosConfigToServer(nivelesEducativos, updated);
             window.showToast('Estado laboral eliminado.', 'success');
           }
         } catch (err: any) {

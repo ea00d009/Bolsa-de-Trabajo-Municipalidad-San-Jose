@@ -339,7 +339,7 @@ export default function UserManual() {
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
             <li style={{ marginBottom: '6px' }}><strong>Rubros y Barrios:</strong> Se sincronizan directamente con la base de datos MySQL/MariaDB y se utilizan tanto en Postulantes como en Empresas.</li>
-            <li style={{ marginBottom: '0' }}><strong>Niveles Educativos y Estados Laborales:</strong> Permiten agregar nuevas opciones, renombrarlas en línea o eliminarlas según las necesidades operativas de la oficina.</li>
+            <li style={{ marginBottom: '0' }}><strong>Niveles Educativos y Estados Laborales:</strong> Se almacenan centralizadamente en el servidor (<code>/api/catalogos-config</code>) para que todas las computadoras de la red LAN compartan exactamente las mismas opciones.</li>
           </ul>
 
           <h3 style={styles.subSectionTitle}>2. Persistencia de Tema Claro / Oscuro por Usuario</h3>
@@ -347,14 +347,15 @@ export default function UserManual() {
             La plataforma permite alternar entre <strong>Modo Claro</strong> y <strong>Modo Oscuro</strong> desde el icono de sol/luna de la cabecera. La preferencia se recuerda individualmente para cada usuario (<code>theme_usuario</code>) al iniciar sesión.
           </p>
 
-          <h3 style={styles.subSectionTitle}>3. Inicio Automático al Encender la Computadora</h3>
+          <h3 style={styles.subSectionTitle}>3. Operación en Red LAN, Inicio Automático y Respaldos</h3>
           <p style={styles.paragraph}>
-            El sistema está configurado para iniciarse automáticamente en segundo plano cada vez que se enciende la PC e inicia sesión en Windows, sin mostrar ventanas de consola:
+            El sistema está preparado para funcionar como servidor central de la oficina, permitiendo que varios entrevistadores trabajen en simultáneo desde sus propias computadoras:
           </p>
           <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
-            <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible:</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> registrado en el arranque de Windows ejecuta <code>scripts/autostart-services.ps1</code>, levantando automáticamente <strong>MariaDB</strong> (puerto <code>3306</code>), el <strong>Backend Spring Boot</strong> precompilado (puerto <code>8080</code>) y el <strong>Frontend React/Vite</strong> (puerto <code>5173</code>).</li>
-            <li style={{ marginBottom: '6px' }}><strong>Control manual:</strong> Si se desea detener todos los servicios manualmente, basta con ejecutar <code>detener.bat</code> en la carpeta raíz del proyecto; para volver a iniciarlos manualmente, se puede ejecutar <code>iniciar.bat</code>.</li>
-            <li style={{ marginBottom: '0' }}><strong>Registros de diagnóstico (Logs):</strong> Las salidas de los tres servicios se guardan automáticamente en la carpeta <code>logs/</code> del proyecto.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Acceso desde otras PCs de la Red LAN:</strong> Cualquier computadora conectada a la misma red de la oficina puede ingresar abriendo el navegador en <code>http://DESKTOP-OB5FKHB:5173</code> (o usando la IP local de esta PC seguida de <code>:5173</code>). Los listados de Postulantes y Empresas se sincronizan automáticamente cada 30 segundos y al recuperar el foco de la ventana.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible y sin suspensión:</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> ejecuta <code>scripts/autostart-services.ps1</code> al iniciar Windows, levantando <strong>MariaDB</strong> blindado en <code>127.0.0.1:3306</code>, el <strong>Backend Spring Boot</strong> en el puerto <code>8080</code> y el <strong>Frontend</strong> abierto a la LAN en <code>0.0.0.0:5173</code>, además de desactivar la suspensión automática de Windows mientras la PC está enchufada.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Respaldos automáticos y manuales de Base de Datos:</strong> Cada día al iniciar el sistema se genera automáticamente una copia de seguridad completa en <code>database/backups_locales/backup_automatico_YYYY-MM-DD.sql</code> (conservando los últimos 30 días). También se puede generar un respaldo instantáneo en cualquier momento haciendo doble clic en <code>respaldar-bd.bat</code>.</li>
+            <li style={{ marginBottom: '0' }}><strong>Control manual y Logs:</strong> Para detener todos los servicios manualmente basta con ejecutar <code>detener.bat</code>; para iniciarlos, <code>iniciar.bat</code>. Los registros técnicos se guardan en <code>logs/</code>.</li>
           </ul>
         </div>
       )
