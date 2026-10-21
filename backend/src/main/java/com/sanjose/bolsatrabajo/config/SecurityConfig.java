@@ -86,8 +86,11 @@ public class SecurityConfig {
             "http://10.*:*",
             "http://172.*:*",
             "http://*.local:*",
+            "http://sistema:*",
+            "http://SISTEMA:*",
             "http://DESKTOP-OB5FKHB:*",
-            "http://desktop-ob5fkhb:*"
+            "http://desktop-ob5fkhb:*",
+            "http://*:5173"
         ));
         for (String origin : allowedOrigins.split(",")) {
             String trimmed = origin.trim();
