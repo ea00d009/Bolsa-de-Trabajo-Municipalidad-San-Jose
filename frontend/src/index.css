@@ -119,6 +119,16 @@
   padding: 0;
 }
 
+/* Evitar que aparezca el cursor de texto parpadeante (caret) al hacer clic fuera de campos editables */
+*:not(input):not(textarea):not([contenteditable="true"]) {
+  caret-color: transparent !important;
+}
+
+img, svg, button, aside, nav, header {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 html {
   scrollbar-gutter: stable;
 }
