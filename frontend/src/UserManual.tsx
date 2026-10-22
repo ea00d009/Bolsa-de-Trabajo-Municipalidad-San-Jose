@@ -222,6 +222,13 @@ export default function UserManual() {
           <p style={styles.paragraph}>
             Haciendo clic en el icono del ojo (<strong>Ver ficha completa</strong>) en cualquier tarjeta se accede a la vista institucional completa con accesos directos para llamar por teléfono, enviar correo o abrir el sitio web de la empresa. Si se da de baja una empresa y tiempo después se vuelve a registrar el mismo CUIT, el sistema reactiva automáticamente su registro histórico actualizando sus datos.
           </p>
+
+          <h3 style={styles.subSectionTitle}>4. Validaciones Automáticas</h3>
+          <ul style={{ ...styles.bulletList, paddingLeft: '20px', margin: '0 0 16px 0' }}>
+            <li style={{ marginBottom: '6px' }}><strong>CUIT inválido:</strong> Si el dígito verificador no coincide con el cálculo oficial de AFIP, el sistema rechaza la carga e informa el error.</li>
+            <li style={{ marginBottom: '6px' }}><strong>CUIT duplicado:</strong> No se permite registrar dos empresas activas con el mismo CUIT; el mensaje indica a qué empresa pertenece.</li>
+            <li style={{ marginBottom: '0' }}><strong>Sin medio de contacto:</strong> Toda empresa debe tener al menos un teléfono o un correo electrónico.</li>
+          </ul>
         </div>
       )
     },
@@ -359,7 +366,8 @@ export default function UserManual() {
             <li style={{ marginBottom: '6px' }}><strong>Instalador de Certificado para PCs de Entrevistadores (1 clic):</strong> Para que cualquier computadora nueva de la oficina muestre el candado de <em>Sitio Seguro</em> sin advertencias en Chrome o Edge, basta con ejecutar una única vez en esa PC el archivo <code>certs/instalar-certificado-pc.bat</code> (también descargable desde <code>https://sistema:5173/instalar-certificado-pc.bat</code>).</li>
             <li style={{ marginBottom: '6px' }}><strong>Inicio automático invisible y Auto-Recuperación (Watchdog):</strong> El lanzador <code>scripts/iniciar-oculto.vbs</code> ejecuta <code>scripts/autostart-services.ps1</code> al encender la PC, levantando <strong>MariaDB</strong> blindado en <code>127.0.0.1:3306</code>, el <strong>Backend Spring Boot</strong> en <code>8080</code> y el <strong>Frontend HTTPS</strong> en <code>0.0.0.0:5173</code>. Además, la tarea programada <code>BolsaTrabajoWatchdog</code> verifica cada 5 minutos que los 3 servicios estén activos y los levanta automáticamente si alguno se detiene.</li>
             <li style={{ marginBottom: '6px' }}><strong>Respaldos automáticos y manuales de Base de Datos:</strong> Cada día al iniciar el sistema se genera una copia de seguridad en <code>database/backups_locales/backup_automatico_YYYY-MM-DD.sql</code> (conservando 30 días), y puede ejecutarse un respaldo instantáneo en cualquier momento con doble clic en <code>respaldar-bd.bat</code>.</li>
-            <li style={{ marginBottom: '0' }}><strong>Actualización en 1 clic y Control manual:</strong> Ejecutando <code>actualizar.bat</code> el servidor respalda la base de datos, descarga las últimas mejoras desde GitHub (<code>git pull</code>), recompila el sistema y reinicia los servicios. Para detener o iniciar manualmente todos los procesos se dispone de <code>detener.bat</code> e <code>iniciar.bat</code>.</li>
+            <li style={{ marginBottom: '6px' }}><strong>Actualización en 1 clic y Control manual:</strong> Ejecutando <code>actualizar.bat</code> el servidor respalda la base de datos, descarga las últimas mejoras desde GitHub (<code>git pull</code>), recompila el sistema y reinicia los servicios. Para detener o iniciar manualmente todos los procesos se dispone de <code>detener.bat</code> e <code>iniciar.bat</code>.</li>
+            <li style={{ marginBottom: '0' }}><strong>Ícono institucional para el Acceso Directo:</strong> En la carpeta raíz del sistema se incluyen <code>icono-sjtp.ico</code> (versión clara) e <code>icono-sjtp-oscuro.ico</code> (versión oscura), en múltiples resoluciones (16 a 256 px). Para aplicarlo: clic derecho sobre el acceso directo del escritorio → <em>Propiedades</em> → <em>Cambiar icono…</em> → <em>Examinar</em> y seleccionar el archivo <code>.ico</code>. La pestaña del navegador también muestra el ícono SJTP.</li>
           </ul>
         </div>
       )

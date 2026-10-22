@@ -66,6 +66,7 @@ graph LR
 * **Padrón Productivo Local:** Registro de comercios, PyMEs e industrias con formateo automático de **CUIT** (`XX-XXXXXXXX-X`), razón social, nombre de fantasía, rubro, dotación de empleados, dirección, barrio y datos de contacto directos (clic para llamar o enviar correo).
 * **Semáforo de Demanda de Personal:** Clasificación rápida por interés de contratación (`Busca personal`, `Interés a futuro`, `Sin búsquedas`, `Sin dato`) y adhesión a **Programas Municipales de Empleo**.
 * **Trazabilidad y Reactivación por CUIT:** Registra automáticamente qué entrevistador relevó cada empresa y restaura fichas inactivas si se vuelve a relevar un mismo CUIT.
+* **Validaciones verificadas de punta a punta:** CUIT con dígito verificador AFIP (`400`), CUIT duplicado en empresa activa (`409`) y obligatoriedad de al menos un medio de contacto (`400`). Alta, edición, baja lógica y reactivación probadas contra la API en producción.
 
 ### 3. 📊 Panel de Informes y Estadísticas Unificado (`SuperAdmin`)
 Consolida en una única vista ejecutiva las métricas de **Postulantes** (sección superior) y las métricas de **Empresas Relevadas** (sección inferior):
@@ -325,6 +326,7 @@ El sistema cuenta con automatización completa para operar como servidor dedicad
 | **`scripts/ensure-https-cert.ps1`** | Gestiona automáticamente la Autoridad de Certificación Raíz Local (`OficinaEmpleo-RootCA.crt`, 10 años) y el certificado TLS del servidor (`sistema.crt`, renovado automáticamente si cambia la IP local). |
 | **`certs/instalar-certificado-pc.bat`** | Instalador en 1 clic del certificado raíz para las PCs de entrevistadores de la red LAN, habilitando el candado de **Sitio Seguro** en Chrome / Edge. |
 | **`iniciar.bat` / `detener.bat`** | Permiten iniciar o detener manualmente todos los servicios (pausando el *Watchdog* al detener). |
+| **`icono-sjtp.ico` / `icono-sjtp-oscuro.ico`** | Íconos institucionales SJTP multi-resolución (16–256 px) para el acceso directo de Windows (*Propiedades → Cambiar icono…*). El favicon web (`frontend/public/favicon.ico` / `.png`) usa el mismo diseño. |
 
 ### 🌐 Acceso Seguro (HTTPS) desde las Computadoras de la Oficina (Red LAN)
 * **Desde la propia PC Servidor:** `https://localhost:5173` *(o `https://sistema:5173`)*
